@@ -1,4 +1,3 @@
-
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -30,6 +29,8 @@ class Prestamo(db.Model):
     fecha_reporte = db.Column(db.DateTime, nullable=True)
 
 with app.app_context():
+    # Elimina las tablas antiguas si tienen un esquema viejo para evitar el error 500
+    db.drop_all()
     db.create_all()
 
 @app.route('/')
