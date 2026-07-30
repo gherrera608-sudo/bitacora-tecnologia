@@ -26,12 +26,7 @@
                     </div>
                 </div>
                 
-                {% if request.endpoint not in ['vista_estudiante'] %}
-                <div class="flex space-x-2 text-sm font-medium">
-                    <a href="{{ url_for('vista_direccion') }}" class="px-3.5 py-2 rounded-lg hover:bg-zinc-800 transition text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700">Dirección</a>
-                    <a href="{{ url_for('vista_profesor') }}" class="px-3.5 py-2 rounded-lg bg-red-700 hover:bg-red-600 text-white transition shadow-md shadow-red-900/30 font-semibold">Profesor</a>
-                </div>
-                {% endif %}
+                {# No se muestran botones de navegación para mantener las áreas totalmente separadas #}
             </div>
         </div>
     </nav>
