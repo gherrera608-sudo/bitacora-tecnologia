@@ -44,8 +44,12 @@ def _jinja2_filter_datetime(date, fmt=None):
     return date.strftime(fmt or '%d/%m/%Y %H:%M')
 
 def limpiar_cedula(val):
-    # Extrae únicamente los dígitos numéricos
     return re.sub(r'\D', '', val or '')
+
+def es_inventario_valido(val):
+    # Acepta formatos como 3982-0000 o solo números de 4 a 10 dígitos (sin letras)
+    pattern = r'^\d{3,6}-\d{3,6}$|^\d{4,10}$'
+    return bool(re.match(pattern, val.strip()))
 
 @app.route('/')
 @app.route('/direccion')
@@ -173,16 +177,21 @@ def descargar_reporte():
 @app.route('/profesor', methods=['GET', 'POST'])
 def vista_profesor():
     if request.method == 'POST':
+        inventario_raw = request.form.get('inventario', '').strip()
         cedula_raw = request.form.get('cedula', '')
         cedula_clean = limpiar_cedula(cedula_raw)
+
+        # Validaciones de seguridad
+        if not es_inventario_valido(inventario_raw):
+            flash("El N° de Inventario no es válido. Debe tener el formato 3982-0000 o solo números sin letras.", "error")
+            return redirect(url_for('vista_profesor'))
         
-        # Validación de cédula (debe tener entre 8 y 12 dígitos)
         if not (8 <= len(cedula_clean) <= 12):
-            flash("La cédula o identificación debe contener solo números (de 9 a 12 dígitos sin guiones).", "error")
+            flash("La cédula o identificación debe contener solo números (de 8 a 12 dígitos sin guiones).", "error")
             return redirect(url_for('vista_profesor'))
 
         nuevo_prestamo = Prestamo(
-            inventario=request.form['inventario'].strip().upper()[:15],
+            inventario=inventario_raw.upper()[:15],
             marca_modelo=request.form['marca_modelo'].strip()[:100],
             cedula=cedula_clean,
             estudiante=request.form['estudiante'].strip()[:100],
@@ -203,14 +212,19 @@ def vista_profesor():
 def editar_prestamo(id):
     prestamo = Prestamo.query.get_or_404(id)
     if request.method == 'POST':
+        inventario_raw = request.form.get('inventario', '').strip()
         cedula_raw = request.form.get('cedula', '')
         cedula_clean = limpiar_cedula(cedula_raw)
+
+        if not es_inventario_valido(inventario_raw):
+            flash("El N° de Inventario no es válido. Debe ser tipo 3982-0000 o solo números sin letras.", "error")
+            return redirect(url_for('editar_prestamo', id=id))
         
         if not (8 <= len(cedula_clean) <= 12):
-            flash("La cédula o identificación debe contener solo números (de 9 a 12 dígitos sin guiones).", "error")
+            flash("La cédula debe contener solo números (entre 8 y 12 dígitos).", "error")
             return redirect(url_for('editar_prestamo', id=id))
 
-        prestamo.inventario = request.form['inventario'].strip().upper()[:15]
+        prestamo.inventario = inventario_raw.upper()[:15]
         prestamo.marca_modelo = request.form['marca_modelo'].strip()[:100]
         prestamo.cedula = cedula_clean
         prestamo.estudiante = request.form['estudiante'].strip()[:100]
