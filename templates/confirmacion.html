@@ -1,9 +1,40 @@
 {% extends 'layout.html' %}
-{% block title %}Confirmado{% endblock %}
+{% block title %}Confirmación Guardada{% endblock %}
 {% block content %}
-<div class="max-w-md mx-auto text-center bg-slate-950 border border-slate-800 rounded-2xl p-8">
-    <h1 class="text-2xl font-bold text-emerald-400 mb-2">¡Recepción Guardada!</h1>
-    <p class="text-slate-400 text-sm mb-4">Se ha registrado la confirmación del equipo <b class="text-white">{{ prestamo.inventario }}</b>.</p>
-    <a href="{{ url_for('vista_estudiante') }}" class="inline-block bg-slate-800 text-white px-4 py-2 rounded-xl text-sm">Volver</a>
+<div class="max-w-md mx-auto bg-zinc-950 border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl space-y-5">
+    <!-- Icono de Éxito en Rojo Institucional -->
+    <div class="w-16 h-16 bg-red-950/60 border border-red-800 text-red-500 rounded-full flex items-center justify-center mx-auto text-2xl font-bold shadow-lg shadow-red-950/50">
+        ✓
+    </div>
+
+    <!-- Título y Descripción -->
+    <h1 class="text-2xl font-black text-white tracking-wide">¡Recepción de Equipo Guardada!</h1>
+    
+    <p class="text-xs text-zinc-300 leading-relaxed">
+        Se ha registrado con éxito la confirmación del equipo 
+        <b class="font-mono text-red-400 text-sm block mt-1 bg-zinc-900 py-1.5 px-3 rounded-lg border border-zinc-800 inline-block">
+            {{ prestamo.inventario }}
+        </b>
+    </p>
+
+    {% if prestamo and prestamo.estudiante %}
+        <p class="text-[11px] text-zinc-400">
+            Estudiante: <b class="text-white">{{ prestamo.estudiante }}</b>
+        </p>
+    {% endif %}
+
+    {% if prestamo and prestamo.novedad_detectada %}
+        <div class="bg-red-950/40 border border-red-800 p-3 rounded-xl text-left text-xs text-red-200 space-y-1">
+            <div class="font-bold">⚠️ Observación registrada:</div>
+            <div>{{ prestamo.reporte_estudiante if prestamo.reporte_estudiante else "Detalle o faltante reportado con el cargador." }}</div>
+        </div>
+    {% endif %}
+
+    <!-- Botón Volver -->
+    <div class="pt-2">
+        <a href="{{ url_for('vista_estudiante') }}" class="inline-block bg-red-700 hover:bg-red-600 text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md transition">
+            Volver
+        </a>
+    </div>
 </div>
 {% endblock %}
