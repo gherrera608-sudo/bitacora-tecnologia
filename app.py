@@ -28,10 +28,16 @@ class Prestamo(db.Model):
     novedad_detectada = db.Column(db.Boolean, default=False)
     fecha_reporte = db.Column(db.DateTime, nullable=True)
 
+# Recrear la base de datos limpia
 with app.app_context():
-    # Elimina las tablas antiguas si tienen un esquema viejo para evitar el error 500
     db.drop_all()
     db.create_all()
+
+@app.template_filter('strftime')
+def _jinja2_filter_datetime(date, fmt=None):
+    if date is None:
+        return "-"
+    return date.strftime(fmt or '%d/%m/%Y %H:%M')
 
 @app.route('/')
 @app.route('/direccion')
