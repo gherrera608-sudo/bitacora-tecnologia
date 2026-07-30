@@ -7,14 +7,33 @@
         <a href="{{ url_for('vista_direccion') }}" class="text-xs text-slate-400 hover:text-white">Cancelar</a>
     </div>
     <form action="{{ url_for('editar_prestamo', id=prestamo.id) }}" method="POST" class="space-y-4">
-        <div>
-            <label class="text-xs font-semibold text-slate-300">N° Inventario</label>
-            <input type="text" name="inventario" value="{{ prestamo.inventario }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white font-mono uppercase">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-semibold text-slate-300">Nombre del Profesor</label>
+                <input type="text" name="profesor" value="{{ prestamo.profesor }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-slate-300">Asignatura / Especialidad</label>
+                <select name="asignatura" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
+                    <option value="Tecnología Informática" {% if prestamo.asignatura == 'Tecnología Informática' %}selected{% endif %}>Tecnología Informática</option>
+                    <option value="Secretariado Ejecutivo" {% if prestamo.asignatura == 'Secretariado Ejecutivo' %}selected{% endif %}>Secretariado Ejecutivo</option>
+                    <option value="Contabilidad" {% if prestamo.asignatura == 'Contabilidad' %}selected{% endif %}>Contabilidad</option>
+                    <option value="Formación Tecnológica" {% if prestamo.asignatura == 'Formación Tecnológica' %}selected{% endif %}>Formación Tecnológica</option>
+                </select>
+            </div>
         </div>
-        <div>
-            <label class="text-xs font-semibold text-slate-300">Marca y Modelo</label>
-            <input type="text" name="marca_modelo" value="{{ prestamo.marca_modelo }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-semibold text-slate-300">N° Inventario</label>
+                <input type="text" name="inventario" value="{{ prestamo.inventario }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white font-mono uppercase">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-slate-300">Marca y Modelo</label>
+                <input type="text" name="marca_modelo" value="{{ prestamo.marca_modelo }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
+            </div>
         </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-semibold text-slate-300">N° Cédula</label>
@@ -25,21 +44,33 @@
                 <input type="text" name="estudiante" value="{{ prestamo.estudiante }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
             </div>
         </div>
+
         <div>
-            <label class="text-xs font-semibold text-slate-300">Grupo</label>
+            <label class="text-xs font-semibold text-slate-300">Sección / Grupo</label>
             <select name="grupo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
-                <option value="10-4" {% if prestamo.grupo == '10-4' %}selected{% endif %}>10-4</option>
-                <option value="11-8" {% if prestamo.grupo == '11-8' %}selected{% endif %}>11-8</option>
+                {% set secciones = [
+                    '7-1','7-2','7-3','7-4','7-5','7-6','7-7','7-8','7-9','7-10','7-11','7-12','7-13','7-14',
+                    '8-1','8-2','8-3','8-4','8-5','8-6','8-7','8-8','8-9','8-10','8-11','8-12',
+                    '9-1','9-2','9-3','9-4','9-5','9-6','9-7','9-8','9-9','9-10','9-11',
+                    '10-1','10-2','10-3','10-4','10-5','10-6','10-7','10-8','10-9',
+                    '11-1','11-2','11-3','11-4','11-5','11-6','11-7','11-8'
+                ] %}
+                {% for sec in secciones %}
+                    <option value="{{ sec }}" {% if prestamo.grupo == sec %}selected{% endif %}>{{ sec }}</option>
+                {% endfor %}
             </select>
         </div>
+
         <div class="flex gap-4">
             <label class="text-sm"><input type="checkbox" name="cargador" value="Sí" {% if prestamo.cargador_entregado == 'Sí' %}checked{% endif %}> Incluye Cargador</label>
             <label class="text-sm"><input type="checkbox" name="caja" value="Sí" {% if prestamo.caja_entregada == 'Sí' %}checked{% endif %}> Entregado en Caja</label>
         </div>
+
         <div>
             <label class="text-xs font-semibold text-slate-300">Estado Físico Inicial</label>
             <textarea name="estado_inicial" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm">{{ prestamo.estado_inicial }}</textarea>
         </div>
+
         <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl">Guardar Cambios</button>
     </form>
 </div>
