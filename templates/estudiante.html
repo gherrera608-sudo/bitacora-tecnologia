@@ -14,15 +14,20 @@
             <div>
                 <label class="text-xs font-semibold text-zinc-300">Digita el N° de Inventario</label>
                 <div class="flex gap-2 mt-1">
-                    <!-- Solo permite números y guión (Ej: 3982-0000 o números solos) -->
-                    <input type="text" name="inv" value="{{ inv_query }}" 
-                           placeholder="EJ: 3982-0000" 
-                           pattern="[0-9]{3,6}-[0-9]{3,6}|[0-9]{4,10}"
-                           maxlength="12"
-                           title="Ingresa un número de inventario válido (ej: 3982-0000 o solo números)."
-                           required 
-                           class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white font-mono uppercase outline-none transition">
-                    <button type="submit" class="bg-red-700 hover:bg-red-600 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-md shadow-red-950/40 text-sm">
+                    <!-- Prefijo 3982- Fijo -->
+                    <div class="flex items-center bg-zinc-900 border border-zinc-700 focus-within:border-red-500 rounded-xl px-4 py-2.5 transition w-full">
+                        <span class="text-white font-mono font-bold text-lg select-none pr-1">3982-</span>
+                        <input type="text" name="inv" value="{{ inv_query.replace('3982-', '') if inv_query else '' }}" 
+                               placeholder="0000" 
+                               pattern="[0-9]{4}" 
+                               maxlength="4" minlength="4"
+                               inputmode="numeric"
+                               title="Ingresa únicamente los últimos 4 dígitos del número de inventario."
+                               required 
+                               class="w-full bg-transparent text-white font-mono font-bold text-lg outline-none tracking-widest placeholder-zinc-600">
+                    </div>
+
+                    <button type="submit" class="bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-md shadow-red-950/40 text-sm flex items-center justify-center">
                         Buscar
                     </button>
                 </div>
@@ -32,9 +37,9 @@
 
     <!-- Resultados del Préstamo -->
     {% if inv_query %}
+        {% set inv_busqueda = ('3982-' + inv_query) if not inv_query.startswith('3982') else inv_query %}
         {% if prestamo %}
             {% if prestamo.confirmado_estudiante %}
-                <!-- Tarjeta cuando el equipo YA fue confirmado -->
                 <div class="bg-zinc-950 border border-red-900/60 rounded-2xl p-6 text-center space-y-3 shadow-xl">
                     <div class="w-12 h-12 bg-red-950/60 text-red-500 rounded-full flex items-center justify-center mx-auto text-xl border border-red-800 shadow-md shadow-red-950/50">
                         ✓
@@ -45,7 +50,6 @@
                     </p>
                 </div>
             {% else %}
-                <!-- Formulario de confirmación cuando está PENDIENTE -->
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-4">
                     <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-2">
                         <div class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Detalles del Préstamo</div>
@@ -85,7 +89,7 @@
             {% endif %}
         {% else %}
             <div class="bg-zinc-950 border border-red-900/50 rounded-2xl p-6 text-center text-zinc-400 text-sm">
-                ⚠️ No se encontró ningún préstamo activo con el número de inventario <b class="font-mono text-red-400">{{ inv_query }}</b>.
+                ⚠️ No se encontró ningún préstamo activo con el número de inventario <b class="font-mono text-red-400">3982-{{ inv_query.replace('3982-', '') }}</b>.
             </div>
         {% endif %}
     {% endif %}
