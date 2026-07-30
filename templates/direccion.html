@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{{% extends 'layout.html' %}
 {% block title %}Panel Dirección{% endblock %}
 {% block content %}
 <div class="flex justify-between items-center mb-8">
@@ -13,26 +13,36 @@
     <table class="w-full text-left text-sm text-slate-300">
         <thead class="bg-slate-900 text-xs text-slate-400 uppercase border-b border-slate-800">
             <tr>
+                <th class="p-4">Fecha / Hora</th>
                 <th class="p-4">Inventario</th>
-                <th class="p-4">Estudiante / Grupo</th>
+                <th class="p-4">Cédula / Estudiante</th>
                 <th class="p-4">Marca y Modelo</th>
                 <th class="p-4">Estado / Cargador</th>
                 <th class="p-4">Confirmación QR</th>
                 <th class="p-4">Reporte Estudiante</th>
+                <th class="p-4 text-center">Acciones</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-800/60">
             {% for p in prestamos %}
             <tr class="hover:bg-slate-900/40">
+                <td class="p-4 text-xs font-mono text-slate-400">
+                    {{ p.fecha_entrega.strftime('%d/%m/%Y %H:%M') if p.fecha_entrega else '-' }}
+                </td>
                 <td class="p-4 font-mono font-bold text-blue-400">{{ p.inventario }}</td>
-                <td class="p-4"><div class="font-semibold text-white">{{ p.estudiante }}</div><div class="text-xs text-slate-400">{{ p.grupo }}</div></td>
+                <td class="p-4">
+                    <div class="font-bold text-blue-300 font-mono text-xs">Cédula: {{ p.cedula }}</div>
+                    <div class="font-semibold text-white">{{ p.estudiante }}</div>
+                    <div class="text-xs text-slate-400">{{ p.grupo }}</div>
+                </td>
                 <td class="p-4">{{ p.marca_modelo }}</td>
                 <td class="p-4 text-xs">Cargador: <b class="text-emerald-400">{{ p.cargador_entregado }}</b><br><span class="italic text-slate-400">{{ p.estado_inicial }}</span></td>
                 <td class="p-4">
                     {% if p.confirmado_estudiante %}
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">Recibido</span>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800 block text-center mb-1">Recibido</span>
+                        <span class="text-[10px] text-slate-500 font-mono block text-center">{{ p.fecha_reporte.strftime('%d/%m/%Y %H:%M') if p.fecha_reporte else '' }}</span>
                     {% else %}
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800">Pendiente</span>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800 block text-center">Pendiente</span>
                     {% endif %}
                 </td>
                 <td class="p-4">
@@ -41,6 +51,18 @@
                     {% else %}
                         <span class="text-xs text-slate-500 italic">Sin novedades</span>
                     {% endif %}
+                </td>
+                <td class="p-4">
+                    <div class="flex items-center justify-center gap-2">
+                        <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="p-2 bg-slate-800 hover:bg-amber-600/30 text-amber-400 rounded-lg transition text-xs" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este registro?');">
+                            <button type="submit" class="p-2 bg-slate-800 hover:bg-rose-600/30 text-rose-400 rounded-lg transition text-xs" title="Eliminar">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% endfor %}
