@@ -7,7 +7,6 @@
         <h1 class="text-xl font-bold text-white tracking-wide">Entrega de Equipo (Profesor)</h1>
     </div>
 
-    <!-- Mostrar alertas de error si las hay -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -39,14 +38,18 @@
             <div>
                 <div class="flex justify-between items-center mb-0.5">
                     <label class="text-xs font-semibold text-zinc-300">N° Inventario</label>
-                    <span class="text-[10px] text-zinc-500">Ej: 3982-0000</span>
+                    <span class="text-[10px] text-zinc-500">Últimos 4 dígitos</span>
                 </div>
-                <!-- Solo números y guión (Sin letras) -->
-                <input type="text" name="inventario" placeholder="Ej: 3982-0000" 
-                       pattern="[0-9]{3,6}-[0-9]{3,6}|[0-9]{4,10}" 
-                       maxlength="12" 
-                       title="El N° de Inventario debe ser numérico (ej: 3982-0000 o números sin letras)."
-                       required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white font-mono uppercase outline-none transition">
+                <!-- DISEÑO CON PREFIJO 3982- FIJO -->
+                <div class="flex items-center bg-zinc-900 border border-zinc-700 focus-within:border-red-500 rounded-xl px-3 py-2 transition">
+                    <span class="text-white font-mono font-bold text-base select-none pr-1">3982-</span>
+                    <input type="text" name="inventario" placeholder="0000" 
+                           pattern="[0-9]{4}" 
+                           maxlength="4" minlength="4"
+                           inputmode="numeric"
+                           title="Ingresa únicamente los últimos 4 dígitos del número de inventario."
+                           required class="w-full bg-transparent text-white font-mono font-bold text-base outline-none tracking-widest placeholder-zinc-600">
+                </div>
             </div>
             <div>
                 <label class="text-xs font-semibold text-zinc-300">Marca y Modelo</label>
