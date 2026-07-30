@@ -46,10 +46,13 @@ def _jinja2_filter_datetime(date, fmt=None):
 def limpiar_cedula(val):
     return re.sub(r'\D', '', val or '')
 
-def es_inventario_valido(val):
-    # Acepta formatos como 3982-0000 o solo números de 4 a 10 dígitos (sin letras)
-    pattern = r'^\d{3,6}-\d{3,6}$|^\d{4,10}$'
-    return bool(re.match(pattern, val.strip()))
+def formatear_inventario(val):
+    raw = re.sub(r'\D', '', val or '')
+    if len(raw) == 4:
+        return f"3982-{raw}"
+    elif len(raw) == 8 and raw.startswith('3982'):
+        return f"3982-{raw[4:]}"
+    return val.strip().upper()
 
 @app.route('/')
 @app.route('/direccion')
@@ -177,21 +180,18 @@ def descargar_reporte():
 @app.route('/profesor', methods=['GET', 'POST'])
 def vista_profesor():
     if request.method == 'POST':
-        inventario_raw = request.form.get('inventario', '').strip()
+        inv_input = request.form.get('inventario', '').strip()
+        inventario_final = formatear_inventario(inv_input)
+        
         cedula_raw = request.form.get('cedula', '')
         cedula_clean = limpiar_cedula(cedula_raw)
 
-        # Validaciones de seguridad
-        if not es_inventario_valido(inventario_raw):
-            flash("El N° de Inventario no es válido. Debe tener el formato 3982-0000 o solo números sin letras.", "error")
-            return redirect(url_for('vista_profesor'))
-        
         if not (8 <= len(cedula_clean) <= 12):
-            flash("La cédula o identificación debe contener solo números (de 8 a 12 dígitos sin guiones).", "error")
+            flash("La cédula debe contener solo números (entre 8 y 12 dígitos sin guiones).", "error")
             return redirect(url_for('vista_profesor'))
 
         nuevo_prestamo = Prestamo(
-            inventario=inventario_raw.upper()[:15],
+            inventario=inventario_final,
             marca_modelo=request.form['marca_modelo'].strip()[:100],
             cedula=cedula_clean,
             estudiante=request.form['estudiante'].strip()[:100],
@@ -212,19 +212,17 @@ def vista_profesor():
 def editar_prestamo(id):
     prestamo = Prestamo.query.get_or_404(id)
     if request.method == 'POST':
-        inventario_raw = request.form.get('inventario', '').strip()
+        inv_input = request.form.get('inventario', '').strip()
+        inventario_final = formatear_inventario(inv_input)
+        
         cedula_raw = request.form.get('cedula', '')
         cedula_clean = limpiar_cedula(cedula_raw)
 
-        if not es_inventario_valido(inventario_raw):
-            flash("El N° de Inventario no es válido. Debe ser tipo 3982-0000 o solo números sin letras.", "error")
-            return redirect(url_for('editar_prestamo', id=id))
-        
         if not (8 <= len(cedula_clean) <= 12):
             flash("La cédula debe contener solo números (entre 8 y 12 dígitos).", "error")
             return redirect(url_for('editar_prestamo', id=id))
 
-        prestamo.inventario = inventario_raw.upper()[:15]
+        prestamo.inventario = inventario_final
         prestamo.marca_modelo = request.form['marca_modelo'].strip()[:100]
         prestamo.cedula = cedula_clean
         prestamo.estudiante = request.form['estudiante'].strip()[:100]
@@ -248,12 +246,16 @@ def eliminar_prestamo(id):
 @app.route('/estudiante', methods=['GET', 'POST'])
 @app.route('/reportar', methods=['GET', 'POST'])
 def vista_estudiante():
-    inv_query = request.args.get('inv', '').upper().strip()
+    inv_query_raw = request.args.get('inv', '').strip()
+    inv_query = formatear_inventario(inv_query_raw) if inv_query_raw else ''
+    
     if request.method == 'POST':
-        inv = request.form['inventario'].strip().upper()
-        prestamo = Prestamo.query.filter_by(inventario=inv).order_by(Prestamo.id.desc()).first()
+        inv_post = request.form.get('inventario', '').strip()
+        inv_final = formatear_inventario(inv_post)
+        
+        prestamo = Prestamo.query.filter_by(inventario=inv_final).order_by(Prestamo.id.desc()).first()
         if not prestamo:
-            return redirect(url_for('vista_estudiante', inv=inv))
+            return redirect(url_for('vista_estudiante', inv=inv_post))
             
         prestamo.confirmado_estudiante = True
         prestamo.cargador_recibido = request.form.get('cargador_recibido', 'No')
@@ -268,7 +270,7 @@ def vista_estudiante():
     prestamo_actual = None
     if inv_query:
         prestamo_actual = Prestamo.query.filter_by(inventario=inv_query).order_by(Prestamo.id.desc()).first()
-    return render_template('estudiante.html', inv_query=inv_query, prestamo=prestamo_actual)
+    return render_template('estudiante.html', inv_query=inv_query_raw, prestamo=prestamo_actual)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
