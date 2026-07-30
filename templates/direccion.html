@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title %}Panel Dirección{% endblock %}
 {% block content %}
-<div class="flex justify-between items-center mb-8">
+<div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-white">Panel de Monitoreo - Dirección</h1>
     <div class="flex gap-3">
         <div class="bg-slate-800 p-3 rounded-xl text-center"><span class="text-xs text-slate-400 block">Total</span><span class="text-xl font-bold">{{ total }}</span></div>
@@ -9,15 +9,43 @@
         <div class="bg-rose-950/60 p-3 rounded-xl text-center"><span class="text-xs text-rose-300 block">Novedades</span><span class="text-xl font-bold text-rose-400">{{ novedades }}</span></div>
     </div>
 </div>
+
+<!-- Barra de Filtros -->
+<div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 mb-6">
+    <form method="GET" action="{{ url_for('vista_direccion') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">Filtrar por Asignatura</label>
+            <select name="asignatura" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                <option value="">Todas las asignaturas</option>
+                {% for asig in todas_asignaturas %}
+                    <option value="{{ asig }}" {% if asignatura_filtro == asig %}selected{% endif %}>{{ asig }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">Fecha Desde</label>
+            <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">Fecha Hasta</label>
+            <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl text-sm transition">Filtrar</button>
+            <a href="{{ url_for('vista_direccion') }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2 rounded-xl text-sm transition flex items-center justify-center" title="Limpiar Filtros"><i class="fa-solid fa-arrows-rotate"></i></a>
+        </div>
+    </form>
+</div>
+
 <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
     <table class="w-full text-left text-sm text-slate-300">
         <thead class="bg-slate-900 text-xs text-slate-400 uppercase border-b border-slate-800">
             <tr>
                 <th class="p-4">Fecha / Hora</th>
+                <th class="p-4">Profesor / Asignatura</th>
                 <th class="p-4">Inventario</th>
                 <th class="p-4">Cédula / Estudiante</th>
                 <th class="p-4">Marca y Modelo</th>
-                <th class="p-4">Estado / Cargador</th>
                 <th class="p-4">Confirmación QR</th>
                 <th class="p-4">Reporte Estudiante</th>
                 <th class="p-4 text-center">Acciones</th>
@@ -29,6 +57,10 @@
                 <td class="p-4 text-xs font-mono text-slate-400">
                     {{ p.fecha_entrega|strftime }}
                 </td>
+                <td class="p-4">
+                    <div class="font-bold text-white">{{ p.profesor }}</div>
+                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-950 text-blue-300 border border-blue-800 mt-1">{{ p.asignatura }}</span>
+                </td>
                 <td class="p-4 font-mono font-bold text-blue-400">{{ p.inventario }}</td>
                 <td class="p-4">
                     <div class="font-bold text-blue-300 font-mono text-xs">Cédula: {{ p.cedula }}</div>
@@ -36,7 +68,6 @@
                     <div class="text-xs text-slate-400">{{ p.grupo }}</div>
                 </td>
                 <td class="p-4">{{ p.marca_modelo }}</td>
-                <td class="p-4 text-xs">Cargador: <b class="text-emerald-400">{{ p.cargador_entregado }}</b><br><span class="italic text-slate-400">{{ p.estado_inicial }}</span></td>
                 <td class="p-4">
                     {% if p.confirmado_estudiante %}
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800 block text-center mb-1">Recibido</span>
