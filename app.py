@@ -1,13 +1,14 @@
 import os
+import re
 from io import BytesIO
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 from flask_sqlalchemy import SQLAlchemy
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'bitacora-clave-secret-2026')
+app.secret_key = os.environ.get('SECRET_KEY', 'spet-clave-secret-2026')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bitacora.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -42,12 +43,15 @@ def _jinja2_filter_datetime(date, fmt=None):
         return "-"
     return date.strftime(fmt or '%d/%m/%Y %H:%M')
 
+def limpiar_cedula(val):
+    # Extrae únicamente los dígitos numéricos
+    return re.sub(r'\D', '', val or '')
+
 @app.route('/')
 @app.route('/direccion')
 def vista_direccion():
     query = Prestamo.query
     
-    # Filtros
     asignatura_filtro = request.args.get('asignatura', '')
     fecha_inicio = request.args.get('fecha_inicio', '')
     fecha_fin = request.args.get('fecha_fin', '')
@@ -107,12 +111,10 @@ def descargar_reporte():
 
     prestamos = query.order_by(Prestamo.id.desc()).all()
 
-    # Crear libro de Excel XLSX con openpyxl
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Reporte Préstamos"
 
-    # Encabezados
     headers = [
         'ID', 'Fecha Entrega', 'Docente', 'Asignatura/Especialidad', 
         'N° Inventario', 'Equipo', 'Cédula Estudiante', 'Nombre Estudiante', 
@@ -121,7 +123,6 @@ def descargar_reporte():
     ]
     ws.append(headers)
 
-    # Estilos para el encabezado (Color Rojo del Liceo #990000)
     header_font = Font(name="Arial", size=11, bold=True, color="FFFFFF")
     header_fill = PatternFill(start_color="990000", end_color="990000", fill_type="solid")
     center_align = Alignment(horizontal="center", vertical="center")
@@ -132,7 +133,6 @@ def descargar_reporte():
         cell.fill = header_fill
         cell.alignment = center_align
 
-    # Filas de datos
     for p in prestamos:
         row = [
             p.id,
@@ -153,13 +153,11 @@ def descargar_reporte():
         ]
         ws.append(row)
 
-    # Autoajustar ancho de columnas
     for col in ws.columns:
         max_len = max(len(str(cell.value or '')) for cell in col)
         col_letter = openpyxl.utils.get_column_letter(col[0].column)
         ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
 
-    # Guardar en memoria
     output = BytesIO()
     wb.save(output)
     output.seek(0)
@@ -175,17 +173,25 @@ def descargar_reporte():
 @app.route('/profesor', methods=['GET', 'POST'])
 def vista_profesor():
     if request.method == 'POST':
+        cedula_raw = request.form.get('cedula', '')
+        cedula_clean = limpiar_cedula(cedula_raw)
+        
+        # Validación de cédula (debe tener entre 8 y 12 dígitos)
+        if not (8 <= len(cedula_clean) <= 12):
+            flash("La cédula o identificación debe contener solo números (de 9 a 12 dígitos sin guiones).", "error")
+            return redirect(url_for('vista_profesor'))
+
         nuevo_prestamo = Prestamo(
-            inventario=request.form['inventario'].strip().upper(),
-            marca_modelo=request.form['marca_modelo'].strip(),
-            cedula=request.form['cedula'].strip(),
-            estudiante=request.form['estudiante'].strip(),
+            inventario=request.form['inventario'].strip().upper()[:15],
+            marca_modelo=request.form['marca_modelo'].strip()[:100],
+            cedula=cedula_clean,
+            estudiante=request.form['estudiante'].strip()[:100],
             grupo=request.form['grupo'].strip(),
-            profesor=request.form['profesor'].strip(),
+            profesor=request.form['profesor'].strip()[:100],
             asignatura=request.form['asignatura'].strip(),
             cargador_entregado=request.form.get('cargador', 'No'),
             caja_entregada=request.form.get('caja', 'No'),
-            estado_inicial=request.form['estado_inicial'].strip(),
+            estado_inicial=request.form['estado_inicial'].strip()[:200],
             fecha_entrega=datetime.now()
         )
         db.session.add(nuevo_prestamo)
@@ -197,16 +203,23 @@ def vista_profesor():
 def editar_prestamo(id):
     prestamo = Prestamo.query.get_or_404(id)
     if request.method == 'POST':
-        prestamo.inventario = request.form['inventario'].strip().upper()
-        prestamo.marca_modelo = request.form['marca_modelo'].strip()
-        prestamo.cedula = request.form['cedula'].strip()
-        prestamo.estudiante = request.form['estudiante'].strip()
+        cedula_raw = request.form.get('cedula', '')
+        cedula_clean = limpiar_cedula(cedula_raw)
+        
+        if not (8 <= len(cedula_clean) <= 12):
+            flash("La cédula o identificación debe contener solo números (de 9 a 12 dígitos sin guiones).", "error")
+            return redirect(url_for('editar_prestamo', id=id))
+
+        prestamo.inventario = request.form['inventario'].strip().upper()[:15]
+        prestamo.marca_modelo = request.form['marca_modelo'].strip()[:100]
+        prestamo.cedula = cedula_clean
+        prestamo.estudiante = request.form['estudiante'].strip()[:100]
         prestamo.grupo = request.form['grupo'].strip()
-        prestamo.profesor = request.form['profesor'].strip()
+        prestamo.profesor = request.form['profesor'].strip()[:100]
         prestamo.asignatura = request.form['asignatura'].strip()
         prestamo.cargador_entregado = request.form.get('cargador', 'No')
         prestamo.caja_entregada = request.form.get('caja', 'No')
-        prestamo.estado_inicial = request.form['estado_inicial'].strip()
+        prestamo.estado_inicial = request.form['estado_inicial'].strip()[:200]
         db.session.commit()
         return redirect(url_for('vista_direccion'))
     return render_template('editar.html', prestamo=prestamo)
@@ -221,7 +234,7 @@ def eliminar_prestamo(id):
 @app.route('/estudiante', methods=['GET', 'POST'])
 @app.route('/reportar', methods=['GET', 'POST'])
 def vista_estudiante():
-    inv_query = request.args.get('inv', '').upper()
+    inv_query = request.args.get('inv', '').upper().strip()
     if request.method == 'POST':
         inv = request.form['inventario'].strip().upper()
         prestamo = Prestamo.query.filter_by(inventario=inv).order_by(Prestamo.id.desc()).first()
@@ -230,7 +243,7 @@ def vista_estudiante():
             
         prestamo.confirmado_estudiante = True
         prestamo.cargador_recibido = request.form.get('cargador_recibido', 'No')
-        reporte = request.form.get('reporte', '').strip()
+        reporte = request.form.get('reporte', '').strip()[:300]
         prestamo.reporte_estudiante = reporte
         prestamo.fecha_reporte = datetime.now()
         prestamo.novedad_detectada = True if (len(reporte) > 0 or prestamo.cargador_recibido == 'No') else False
