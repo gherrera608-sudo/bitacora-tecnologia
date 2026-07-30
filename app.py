@@ -47,12 +47,9 @@ def limpiar_cedula(val):
     return re.sub(r'\D', '', val or '')
 
 def formatear_inventario(val):
-    # Extrae solo los dígitos del texto ingresado
     digitos = re.sub(r'\D', '', val or '')
-    # Si ingresó exactamente 4 dígitos (ej: 3803), les antepone 3982-
     if len(digitos) == 4:
         return f"3982-{digitos}"
-    # Si ingresó los 8 dígitos completos (ej: 39823803), los formatea correctamente
     elif len(digitos) == 8 and digitos.startswith('3982'):
         return f"3982-{digitos[4:]}"
     return val.strip().upper()
@@ -208,7 +205,10 @@ def vista_profesor():
         )
         db.session.add(nuevo_prestamo)
         db.session.commit()
-        return redirect(url_for('vista_direccion'))
+        
+        flash("¡Préstamo registrado con éxito! Puede registrar otro equipo.", "success")
+        return redirect(url_for('vista_profesor'))
+        
     return render_template('profesor.html')
 
 @app.route('/editar/<int:id>', methods=['GET', 'POST'])
@@ -250,7 +250,6 @@ def eliminar_prestamo(id):
 @app.route('/reportar', methods=['GET', 'POST'])
 def vista_estudiante():
     inv_query_raw = request.args.get('inv', '').strip()
-    # Si el usuario digita solo los 4 dígitos o el número completo, se formatea correctamente
     inv_query = formatear_inventario(inv_query_raw) if inv_query_raw else ''
     
     if request.method == 'POST':
