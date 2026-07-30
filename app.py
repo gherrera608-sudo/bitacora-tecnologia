@@ -1,9 +1,10 @@
 import os
-import csv
-from io import StringIO
+from io import BytesIO
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, Response
+from flask import Flask, render_template, request, redirect, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'bitacora-clave-secret-2026')
@@ -106,19 +107,36 @@ def descargar_reporte():
 
     prestamos = query.order_by(Prestamo.id.desc()).all()
 
-    si = StringIO()
-    cw = csv.writer(si)
-    cw.writerow([
+    # Crear libro de Excel XLSX con openpyxl
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Reporte Préstamos"
+
+    # Encabezados
+    headers = [
         'ID', 'Fecha Entrega', 'Docente', 'Asignatura/Especialidad', 
         'N° Inventario', 'Equipo', 'Cédula Estudiante', 'Nombre Estudiante', 
         'Sección', 'Incluye Cargador', 'En Caja', 'Estado Inicial', 
-        'Confirmado por Estudiante', 'Fecha Confirmación', 'Reporte / Observaciones'
-    ])
+        'Confirmado Estudiante', 'Fecha Confirmación', 'Reporte / Observaciones'
+    ]
+    ws.append(headers)
 
+    # Estilos para el encabezado (Color Rojo del Liceo #990000)
+    header_font = Font(name="Arial", size=11, bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="990000", end_color="990000", fill_type="solid")
+    center_align = Alignment(horizontal="center", vertical="center")
+    
+    for col_num in range(1, len(headers) + 1):
+        cell = ws.cell(row=1, column=col_num)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center_align
+
+    # Filas de datos
     for p in prestamos:
-        cw.writerow([
+        row = [
             p.id,
-            p.fecha_entrega.strftime('%Y-%m-%d %H:%M') if p.fecha_entrega else '',
+            p.fecha_entrega.strftime('%d/%m/%Y %H:%M') if p.fecha_entrega else '',
             p.profesor,
             p.asignatura,
             p.inventario,
@@ -130,13 +148,29 @@ def descargar_reporte():
             p.caja_entregada,
             p.estado_inicial,
             'Sí' if p.confirmado_estudiante else 'No',
-            p.fecha_reporte.strftime('%Y-%m-%d %H:%M') if p.fecha_reporte else '',
+            p.fecha_reporte.strftime('%d/%m/%Y %H:%M') if p.fecha_reporte else '',
             p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades'
-        ])
+        ]
+        ws.append(row)
 
-    output = Response(si.getvalue(), mimetype='text/csv')
-    output.headers["Content-Disposition"] = f"attachment; filename=Reporte_Prestamos_{datetime.now().strftime('%Y_%m_%d')}.csv"
-    return output
+    # Autoajustar ancho de columnas
+    for col in ws.columns:
+        max_len = max(len(str(cell.value or '')) for cell in col)
+        col_letter = openpyxl.utils.get_column_letter(col[0].column)
+        ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
+
+    # Guardar en memoria
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    nombre_archivo = f"Reporte_Prestamos_{datetime.now().strftime('%Y_%m_%d')}.xlsx"
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=nombre_archivo
+    )
 
 @app.route('/profesor', methods=['GET', 'POST'])
 def vista_profesor():
