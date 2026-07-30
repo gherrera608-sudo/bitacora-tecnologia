@@ -1,3 +1,4 @@
+
 {% extends 'layout.html' %}
 {% block title %}Reporte de Préstamos - Dirección{% endblock %}
 {% block content %}
@@ -74,8 +75,8 @@
                     </a>
                 </div>
 
-                <!-- Tarjetas Resumen -->
-                <div class="flex gap-2 justify-center">
+                <!-- Tarjetas Resumen (Ocultas al imprimir con .no-print) -->
+                <div class="flex gap-2 justify-center no-print">
                     <div class="bg-zinc-50 border border-zinc-200 p-2.5 rounded-xl text-center min-w-[70px]">
                         <span class="text-[9px] text-zinc-500 font-bold uppercase block">Total</span>
                         <span class="text-lg font-black text-zinc-800">{{ total }}</span>
