@@ -1,4 +1,4 @@
-{{% extends 'layout.html' %}
+{% extends 'layout.html' %}
 {% block title %}Panel Dirección{% endblock %}
 {% block content %}
 <div class="flex justify-between items-center mb-8">
@@ -27,7 +27,7 @@
             {% for p in prestamos %}
             <tr class="hover:bg-slate-900/40">
                 <td class="p-4 text-xs font-mono text-slate-400">
-                    {{ p.fecha_entrega.strftime('%d/%m/%Y %H:%M') if p.fecha_entrega else '-' }}
+                    {{ p.fecha_entrega|strftime }}
                 </td>
                 <td class="p-4 font-mono font-bold text-blue-400">{{ p.inventario }}</td>
                 <td class="p-4">
@@ -40,7 +40,7 @@
                 <td class="p-4">
                     {% if p.confirmado_estudiante %}
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800 block text-center mb-1">Recibido</span>
-                        <span class="text-[10px] text-slate-500 font-mono block text-center">{{ p.fecha_reporte.strftime('%d/%m/%Y %H:%M') if p.fecha_reporte else '' }}</span>
+                        <span class="text-[10px] text-slate-500 font-mono block text-center">{{ p.fecha_reporte|strftime }}</span>
                     {% else %}
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800 block text-center">Pendiente</span>
                     {% endif %}
