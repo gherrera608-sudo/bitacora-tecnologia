@@ -6,11 +6,14 @@
     <form action="{{ url_for('vista_profesor') }}" method="POST" class="space-y-4">
         <div><label class="text-xs font-semibold text-slate-300">N° Inventario</label><input type="text" name="inventario" placeholder="Ej: TEC-001" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white font-mono uppercase"></div>
         <div><label class="text-xs font-semibold text-slate-300">Marca y Modelo</label><input type="text" name="marca_modelo" placeholder="Ej: Dell Latitude" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white"></div>
-        <div><label class="text-xs font-semibold text-slate-300">Nombre Estudiante</label><input type="text" name="estudiante" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div><label class="text-xs font-semibold text-slate-300">N° Cédula del Estudiante</label><input type="text" name="cedula" placeholder="Ej: 1-1234-0567" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white font-mono"></div>
+            <div><label class="text-xs font-semibold text-slate-300">Nombre Completo</label><input type="text" name="estudiante" placeholder="Nombre del estudiante" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white"></div>
+        </div>
         <div><label class="text-xs font-semibold text-slate-300">Grupo</label>
             <select name="grupo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
-                <option value="Grupo A">Grupo A</option>
-                <option value="Grupo B">Grupo B</option>
+                <option value="10-4">10-4</option>
+                <option value="11-8">11-8</option>
             </select>
         </div>
         <div class="flex gap-4"><label class="text-sm"><input type="checkbox" name="cargador" value="Sí" checked> Incluye Cargador</label><label class="text-sm"><input type="checkbox" name="caja" value="Sí" checked> Entregado en Caja</label></div>
