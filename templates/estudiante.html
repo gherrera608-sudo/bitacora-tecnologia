@@ -23,18 +23,22 @@
         </form>
     </div>
 
-    <!-- Resultados del Préstamo (si se buscó un inventario) -->
+    <!-- Resultados del Préstamo -->
     {% if inv_query %}
         {% if prestamo %}
             {% if prestamo.confirmado_estudiante %}
-                <div class="bg-zinc-950 border border-emerald-800/60 rounded-2xl p-6 text-center space-y-3">
-                    <div class="w-12 h-12 bg-emerald-950 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl border border-emerald-700">
+                <!-- Tarjeta cuando el equipo YA fue confirmado -->
+                <div class="bg-zinc-950 border border-red-900/60 rounded-2xl p-6 text-center space-y-3 shadow-xl">
+                    <div class="w-12 h-12 bg-red-950/60 text-red-500 rounded-full flex items-center justify-center mx-auto text-xl border border-red-800 shadow-md shadow-red-950/50">
                         ✓
                     </div>
-                    <h2 class="text-lg font-bold text-white">Equipo ya Confirmado</h2>
-                    <p class="text-xs text-zinc-400">El préstamo del equipo <b class="font-mono text-emerald-400">{{ prestamo.inventario }}</b> asignado a <b class="text-white">{{ prestamo.estudiante }}</b> ya fue registrado previamente.</p>
+                    <h2 class="text-lg font-black text-white">Equipo ya Confirmado</h2>
+                    <p class="text-xs text-zinc-300 leading-relaxed">
+                        El préstamo del equipo <b class="font-mono text-red-400 font-bold bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">{{ prestamo.inventario }}</b> asignado a <b class="text-white font-semibold">{{ prestamo.estudiante }}</b> ya fue registrado previamente.
+                    </p>
                 </div>
             {% else %}
+                <!-- Formulario de confirmación cuando está PENDIENTE -->
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-4">
                     <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-2">
                         <div class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Detalles del Préstamo</div>
