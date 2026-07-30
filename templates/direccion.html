@@ -5,7 +5,6 @@
 <!-- Estilos de Impresión Profesional -->
 <style>
 @media print {
-    /* Ocultar barra de navegación superior, formulario de filtros y botones al imprimir */
     nav, form, .no-print {
         display: none !important;
     }
@@ -26,7 +25,6 @@
     th, td {
         padding: 6px 8px !important;
     }
-    /* Mostrar elementos de impresión */
     .print-header {
         display: flex !important;
     }
@@ -49,7 +47,7 @@
         </div>
         <div class="text-right">
             <span class="px-2 py-1 bg-red-100 text-red-800 text-[10px] font-bold rounded uppercase tracking-wider block mb-1">Informe Oficial</span>
-            <span class="text-[10px] text-zinc-600 block">Emitido: {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else '' }}</span>
+            <span class="text-[10px] text-zinc-600 block">Emitido: {{ ahora.strftime('%d/%m/%Y %H:%M') if ahora else '' }}</span>
         </div>
     </div>
 
