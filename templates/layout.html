@@ -25,11 +25,14 @@
                         </div>
                     </div>
                 </div>
+                
+                {# Ocultar los botones de Dirección y Profesor en la vista del Estudiante #}
+                {% if request.endpoint not in ['vista_estudiante'] %}
                 <div class="flex space-x-2 text-sm font-medium">
                     <a href="{{ url_for('vista_direccion') }}" class="px-3 py-2 rounded-md hover:bg-slate-800 transition text-slate-300">Dirección</a>
                     <a href="{{ url_for('vista_profesor') }}" class="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition shadow-sm">Profesor</a>
-                    <a href="{{ url_for('vista_estudiante') }}" class="px-3 py-2 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 transition">Estudiante</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </nav>
