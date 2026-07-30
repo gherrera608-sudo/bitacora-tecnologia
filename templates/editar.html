@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block title %}Editar Registro{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto bg-slate-950 border border-slate-800 rounded-2xl p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-xl font-bold text-white">Editar Registro de Préstamo</h1>
+        <a href="{{ url_for('vista_direccion') }}" class="text-xs text-slate-400 hover:text-white">Cancelar</a>
+    </div>
+    <form action="{{ url_for('editar_prestamo', id=prestamo.id) }}" method="POST" class="space-y-4">
+        <div>
+            <label class="text-xs font-semibold text-slate-300">N° Inventario</label>
+            <input type="text" name="inventario" value="{{ prestamo.inventario }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white font-mono uppercase">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-300">Marca y Modelo</label>
+            <input type="text" name="marca_modelo" value="{{ prestamo.marca_modelo }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-semibold text-slate-300">N° Cédula</label>
+                <input type="text" name="cedula" value="{{ prestamo.cedula }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white font-mono">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-slate-300">Nombre Estudiante</label>
+                <input type="text" name="estudiante" value="{{ prestamo.estudiante }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
+            </div>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-300">Grupo</label>
+            <select name="grupo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white">
+                <option value="Grupo A" {% if prestamo.grupo == 'Grupo A' %}selected{% endif %}>Grupo A</option>
+                <option value="Grupo B" {% if prestamo.grupo == 'Grupo B' %}selected{% endif %}>Grupo B</option>
+            </select>
+        </div>
+        <div class="flex gap-4">
+            <label class="text-sm"><input type="checkbox" name="cargador" value="Sí" {% if prestamo.cargador_entregado == 'Sí' %}checked{% endif %}> Incluye Cargador</label>
+            <label class="text-sm"><input type="checkbox" name="caja" value="Sí" {% if prestamo.caja_entregada == 'Sí' %}checked{% endif %}> Entregado en Caja</label>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-300">Estado Físico Inicial</label>
+            <textarea name="estado_inicial" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm">{{ prestamo.estado_inicial }}</textarea>
+        </div>
+        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl">Guardar Cambios</button>
+    </form>
+</div>
+{% endblock %}
