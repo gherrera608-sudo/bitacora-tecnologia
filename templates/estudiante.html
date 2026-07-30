@@ -1,33 +1,83 @@
 {% extends 'layout.html' %}
-{% block title %}Confirmar Recepción{% endblock %}
+{% block title %}Confirmación Estudiante{% endblock %}
 {% block content %}
-<div class="max-w-md mx-auto bg-slate-950 border border-slate-800 rounded-2xl p-6">
-    <h1 class="text-xl font-bold text-white mb-4 text-center">Confirmación Estudiante</h1>
-    <form action="{{ url_for('vista_estudiante') }}" method="GET" class="mb-6">
-        <label class="text-xs font-semibold text-slate-300 block mb-1">Digita el N° de Inventario</label>
-        <div class="flex gap-2">
-            <input type="text" name="inv" value="{{ inv_query }}" placeholder="Ej: TEC-001" required class="flex-grow bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white font-mono uppercase">
-            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm">Buscar</button>
-        </div>
-    </form>
+<div class="max-w-xl mx-auto space-y-6">
 
-    {% if prestamo %}
-    <form action="{{ url_for('vista_estudiante') }}" method="POST" class="space-y-4 border-t border-slate-800 pt-4">
-        <input type="hidden" name="inventario" value="{{ prestamo.inventario }}">
-        <div class="text-xs bg-slate-900 p-3 rounded-xl border border-slate-800">
-            <div>Estudiante: <b>{{ prestamo.estudiante }}</b></div>
-            <div>Equipo: <b class="text-blue-400">{{ prestamo.marca_modelo }}</b></div>
+    <!-- Tarjeta Búsqueda / Consulta -->
+    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl shadow-black/40">
+        <div class="flex items-center gap-3 mb-6 pb-3 border-b border-zinc-800">
+            <div class="w-2 h-6 bg-red-600 rounded-full"></div>
+            <h1 class="text-xl font-bold text-white tracking-wide">Confirmación Estudiante</h1>
         </div>
-        <div>
-            <label class="text-xs font-semibold text-slate-300 block mb-1">¿Recibiste el cargador?</label>
-            <div class="flex gap-4">
-                <label class="text-sm"><input type="radio" name="cargador_recibido" value="Sí" checked> Sí, vino cargador</label>
-                <label class="text-sm"><input type="radio" name="cargador_recibido" value="No"> No vino cargador</label>
+
+        <form method="GET" action="{{ url_for('vista_estudiante') }}" class="space-y-4">
+            <div>
+                <label class="text-xs font-semibold text-zinc-300">Digita el N° de Inventario</label>
+                <div class="flex gap-2 mt-1">
+                    <input type="text" name="inv" value="{{ inv_query }}" placeholder="EJ: 3982-0000" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white font-mono uppercase outline-none transition">
+                    <button type="submit" class="bg-red-700 hover:bg-red-600 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-md shadow-red-950/40 text-sm">
+                        Buscar
+                    </button>
+                </div>
             </div>
-        </div>
-        <div><label class="text-xs font-semibold text-slate-300 block mb-1">Observaciones / Daños</label><textarea name="reporte" rows="3" placeholder="Si tiene alguna falla o daño, escríbelo aquí..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm"></textarea></div>
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl">Confirmar Recepción</button>
-    </form>
+        </form>
+    </div>
+
+    <!-- Resultados del Préstamo (si se buscó un inventario) -->
+    {% if inv_query %}
+        {% if prestamo %}
+            {% if prestamo.confirmado_estudiante %}
+                <div class="bg-zinc-950 border border-emerald-800/60 rounded-2xl p-6 text-center space-y-3">
+                    <div class="w-12 h-12 bg-emerald-950 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl border border-emerald-700">
+                        ✓
+                    </div>
+                    <h2 class="text-lg font-bold text-white">Equipo ya Confirmado</h2>
+                    <p class="text-xs text-zinc-400">El préstamo del equipo <b class="font-mono text-emerald-400">{{ prestamo.inventario }}</b> asignado a <b class="text-white">{{ prestamo.estudiante }}</b> ya fue registrado previamente.</p>
+                </div>
+            {% else %}
+                <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-2">
+                        <div class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Detalles del Préstamo</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div><span class="text-zinc-400 text-xs block">Estudiante:</span> <b class="text-white">{{ prestamo.estudiante }}</b></div>
+                            <div><span class="text-zinc-400 text-xs block">Cédula:</span> <b class="text-white font-mono">{{ prestamo.cedula }}</b></div>
+                            <div><span class="text-zinc-400 text-xs block">Sección:</span> <b class="text-white">{{ prestamo.grupo }}</b></div>
+                            <div><span class="text-zinc-400 text-xs block">Equipo:</span> <b class="text-red-500 font-mono">{{ prestamo.inventario }}</b></div>
+                        </div>
+                    </div>
+
+                    <form action="{{ url_for('vista_estudiante') }}" method="POST" class="space-y-4 pt-2">
+                        <input type="hidden" name="inventario" value="{{ prestamo.inventario }}">
+
+                        <div>
+                            <label class="text-xs font-semibold text-zinc-300 block mb-2">¿Recibiste el cargador correspondiente?</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+                                    <input type="radio" name="cargador_recibido" value="Sí" checked class="accent-red-600"> Sí, en buen estado
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+                                    <input type="radio" name="cargador_recibido" value="No" class="accent-red-600"> No lo recibí / Faltante
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-zinc-300">Observaciones / Reporte de Daños (Opcional)</label>
+                            <textarea name="reporte" rows="2" placeholder="Describe si el equipo tiene algún detalle físico, daño o falla..." class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white text-sm outline-none transition mt-1"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-950/50 transition">
+                            Confirmar Recepción de Equipo
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="bg-zinc-950 border border-red-900/50 rounded-2xl p-6 text-center text-zinc-400 text-sm">
+                ⚠️ No se encontró ningún préstamo activo con el número de inventario <b class="font-mono text-red-400">{{ inv_query }}</b>.
+            </div>
+        {% endif %}
     {% endif %}
+
 </div>
 {% endblock %}
