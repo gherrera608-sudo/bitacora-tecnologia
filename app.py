@@ -6,12 +6,11 @@ from zoneinfo import ZoneInfo
 from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 from flask_sqlalchemy import SQLAlchemy
 import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import Font, PatternFill, Alignment
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'spet-clave-secret-2026')
 
-# Configuración dinámica para conectar con Neon (PostgreSQL) y respaldo local SQLite
 db_uri = os.environ.get('DATABASE_URL')
 if db_uri and db_uri.startswith("postgres://"):
     db_uri = db_uri.replace("postgres://", "postgresql://", 1)
@@ -292,6 +291,40 @@ def vista_estudiante():
     if inv_query:
         prestamo_actual = Prestamo.query.filter_by(inventario=inv_query).order_by(Prestamo.id.desc()).first()
     return render_template('estudiante.html', inv_query=inv_query_raw, prestamo=prestamo_actual)
+
+@app.route('/importar_datos')
+def importar_datos():
+    archivo = 'respaldo_datos.xlsx'
+    if not os.path.exists(archivo):
+        return "Archivo no encontrado. Asegúrate de subir 'respaldo_datos.xlsx' a la carpeta principal del proyecto."
+
+    wb = openpyxl.load_workbook(archivo)
+    ws = wb.active
+    
+    contador = 0
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        fecha = row[1] if isinstance(row[1], datetime) else datetime.strptime(str(row[1]), '%d/%m/%Y %H:%M')
+        
+        nuevo = Prestamo(
+            fecha_entrega=fecha,
+            profesor=str(row[2]),
+            asignatura=str(row[3]),
+            inventario=str(row[4]),
+            marca_modelo=str(row[5]),
+            cedula=str(row[6]),
+            estudiante=str(row[7]),
+            grupo=str(row[8]),
+            cargador_entregado=str(row[9]),
+            caja_entregada=str(row[10]),
+            estado_inicial=str(row[11]),
+            confirmado_estudiante=True if row[12] == 'Sí' else False,
+            reporte_estudiante=str(row[14]) if row[14] else ""
+        )
+        db.session.add(nuevo)
+        contador += 1
+    
+    db.session.commit()
+    return f"¡Éxito! Se han importado {contador} registros a la base de datos de Neon."
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
