@@ -11,11 +11,14 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'spet-clave-secret-2026')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bitacora.db'
+# Configuración dinámica para conectar con Neon (PostgreSQL) y respaldo local SQLite
+db_uri = os.environ.get('DATABASE_URL')
+if db_uri and db_uri.startswith("postgres://"):
+    db_uri = db_uri.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri or 'sqlite:///bitacora.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Función auxiliar para obtener la hora exacta de Costa Rica (sin tzinfo para compatibilidad limpia con SQLite)
 def hora_cr():
     return datetime.now(ZoneInfo("America/Costa_Rica")).replace(tzinfo=None)
 
@@ -65,11 +68,15 @@ def vista_direccion():
     query = Prestamo.query
     
     asignatura_filtro = request.args.get('asignatura', '')
+    grupo_filtro = request.args.get('grupo', '')
     fecha_inicio = request.args.get('fecha_inicio', '')
     fecha_fin = request.args.get('fecha_fin', '')
     
     if asignatura_filtro:
         query = query.filter_by(asignatura=asignatura_filtro)
+        
+    if grupo_filtro:
+        query = query.filter_by(grupo=grupo_filtro)
         
     if fecha_inicio:
         try:
@@ -87,6 +94,7 @@ def vista_direccion():
             
     prestamos = query.order_by(Prestamo.id.desc()).all()
     todas_asignaturas = [a[0] for a in db.session.query(Prestamo.asignatura).distinct().all() if a[0]]
+    todos_grupos = [g[0] for g in db.session.query(Prestamo.grupo).distinct().all() if g[0]]
     
     total = len(prestamos)
     novedades = sum(1 for p in prestamos if p.novedad_detectada)
@@ -95,19 +103,24 @@ def vista_direccion():
     return render_template('direccion.html', prestamos=prestamos, total=total, 
                            novedades=novedades, confirmados=confirmados, 
                            todas_asignaturas=todas_asignaturas,
+                           todos_grupos=todos_grupos,
                            asignatura_filtro=asignatura_filtro,
+                           grupo_filtro=grupo_filtro,
                            fecha_inicio=fecha_inicio, fecha_fin=fecha_fin,
                            ahora=hora_cr())
 
 @app.route('/descargar_reporte')
 def descargar_reporte():
     asignatura_filtro = request.args.get('asignatura', '')
+    grupo_filtro = request.args.get('grupo', '')
     fecha_inicio = request.args.get('fecha_inicio', '')
     fecha_fin = request.args.get('fecha_fin', '')
     
     query = Prestamo.query
     if asignatura_filtro:
         query = query.filter_by(asignatura=asignatura_filtro)
+    if grupo_filtro:
+        query = query.filter_by(grupo=grupo_filtro)
     if fecha_inicio:
         try:
             dt_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d')
