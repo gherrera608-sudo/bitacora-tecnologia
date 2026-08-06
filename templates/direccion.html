@@ -27,39 +27,40 @@
                 justify-content: space-between !important;
                 align-items: flex-start !important;
                 border-bottom: 2px solid #cc0000 !important;
-                padding-bottom: 12px !important;
-                margin-bottom: 20px !important;
+                padding-bottom: 10px !important;
+                margin-bottom: 15px !important;
             }
             .print-header-left { display: flex !important; align-items: center !important; gap: 12px !important; }
-            .print-logo { width: 50px !important; height: 50px !important; object-fit: contain !important; }
-            .print-school-name { font-size: 13pt !important; font-weight: 900 !important; margin: 0 !important; color: #000 !important; }
-            .print-system-name { font-size: 9pt !important; margin: 0 !important; color: #333 !important; }
+            .print-logo { width: 45px !important; height: 45px !important; object-fit: contain !important; }
+            .print-school-name { font-size: 12pt !important; font-weight: 900 !important; margin: 0 !important; color: #000 !important; }
+            .print-system-name { font-size: 8.5pt !important; margin: 0 !important; color: #333 !important; }
             
             .print-header-right { text-align: right !important; }
-            .print-informe { color: #cc0000 !important; font-size: 8pt !important; font-weight: bold !important; text-transform: uppercase !important; margin: 0 0 4px 0 !important; letter-spacing: 0.5px !important; }
-            .print-date { color: #555 !important; font-size: 7.5pt !important; margin: 0 !important; }
+            .print-informe { color: #cc0000 !important; font-size: 7.5pt !important; font-weight: bold !important; text-transform: uppercase !important; margin: 0 0 2px 0 !important; letter-spacing: 0.5px !important; }
+            .print-date { color: #555 !important; font-size: 7pt !important; margin: 0 !important; }
             
             /* Título del Cuerpo */
-            .print-body-title { font-size: 16pt !important; font-weight: 900 !important; color: #000 !important; margin: 4px 0 !important; }
-            .print-body-subtitle { font-size: 8.5pt !important; color: #555 !important; margin: 0 0 20px 0 !important; }
+            .print-body-title { font-size: 14pt !important; font-weight: 900 !important; color: #000 !important; margin: 2px 0 !important; }
+            .print-body-subtitle { font-size: 8pt !important; color: #555 !important; margin: 0 0 15px 0 !important; }
             
-            /* Configuración de Tabla Exacta */
+            /* Configuración de Tabla Compacta */
             table { width: 100% !important; border-collapse: collapse !important; }
             th {
-                font-size: 7.5pt !important;
+                font-size: 7pt !important;
                 font-weight: 800 !important;
                 color: #222 !important;
                 text-align: left !important;
-                padding: 0 4px 10px 4px !important;
+                padding: 0 4px 6px 4px !important;
                 border-bottom: 1px solid #ccc !important;
                 vertical-align: bottom !important;
             }
             td {
-                font-size: 8pt !important;
-                padding: 12px 4px !important;
+                font-size: 7.5pt !important;
+                padding: 5px 4px !important; /* <-- AQUÍ REDUJIMOS EL ESPACIO VERTICAL */
                 border-bottom: 1px solid #eee !important;
                 vertical-align: top !important;
                 color: #111 !important;
+                line-height: 1.2 !important;
             }
             
             /* Anchos de columna */
@@ -76,25 +77,27 @@
             .print-gray { color: #555 !important; }
             .print-italic { font-style: italic !important; }
             
+            /* Etiqueta de asignatura compacta */
             .print-box-red {
                 border: 1px solid #cc0000 !important;
                 color: #cc0000 !important;
-                padding: 3px 6px !important;
-                border-radius: 4px !important;
-                font-size: 7pt !important;
+                padding: 1.5px 4px !important; /* Menos espacio interno */
+                border-radius: 3px !important;
+                font-size: 6.5pt !important; /* Letra más pequeña */
                 font-weight: bold !important;
                 display: inline-block !important;
-                margin-top: 6px !important;
+                margin-top: 2px !important; /* Más pegado al nombre */
                 text-align: center !important;
-                max-width: 85px !important;
+                max-width: 90px !important;
+                line-height: 1.1 !important;
             }
             
             .print-pill-green {
                 border: 1px solid #10b981 !important;
                 color: #047857 !important;
-                padding: 3px 8px !important;
-                border-radius: 20px !important;
-                font-size: 7.5pt !important;
+                padding: 2px 6px !important;
+                border-radius: 12px !important;
+                font-size: 7pt !important;
                 font-weight: bold !important;
                 display: inline-block !important;
             }
@@ -102,9 +105,9 @@
             .print-pill-orange {
                 border: 1px solid #f59e0b !important;
                 color: #b45309 !important;
-                padding: 3px 8px !important;
-                border-radius: 20px !important;
-                font-size: 7.5pt !important;
+                padding: 2px 6px !important;
+                border-radius: 12px !important;
+                font-size: 7pt !important;
                 font-weight: bold !important;
                 display: inline-block !important;
             }
@@ -119,7 +122,6 @@
     <!-- ======================================================= -->
     <div class="screen-only">
         
-        <!-- Navbar Superior (Oscura y elegante exactamente como la imagen) -->
         <header class="bg-[#050505] text-white border-b border-red-900 py-4 shadow-lg">
             <div class="max-w-[1400px] mx-auto px-6 flex items-center justify-center lg:justify-start">
                 <div class="flex items-center gap-4">
@@ -140,7 +142,6 @@
 
         <main class="max-w-[1400px] mx-auto px-4 pt-6 space-y-6">
             
-            <!-- Panel de Control y Filtros (Blanco) -->
             <section class="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
                     <div>
@@ -153,7 +154,6 @@
                         <p class="text-xs font-medium text-gray-500 mt-1">Panel de Control y Monitoreo Institucional — Dirección</p>
                     </div>
 
-                    <!-- Botones y Métricas -->
                     <div class="flex flex-wrap items-center gap-3">
                         <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
@@ -183,7 +183,6 @@
 
                 <hr class="border-gray-100 my-4">
 
-                <!-- Formulario de Filtros -->
                 <form method="GET" action="{{ url_for('vista_direccion') }}" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                     <div class="md:col-span-3">
                         <label class="block text-[11px] font-bold text-gray-600 mb-1">Especialidad / Asignatura</label>
@@ -216,7 +215,6 @@
                 </form>
             </section>
 
-            <!-- Tabla de Registros (Blanca) -->
             <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -300,7 +298,6 @@
     <!-- ======================================================= -->
     <div class="print-only print-container">
         
-        <!-- Membrete -->
         <div class="print-header">
             <div class="print-header-left">
                 <img src="{{ url_for('static', filename='escudo.png') }}" class="print-logo">
@@ -315,14 +312,12 @@
             </div>
         </div>
 
-        <!-- Título -->
-        <div style="margin-bottom: 25px;">
+        <div style="margin-bottom: 15px;">
             <p class="print-informe">INFORME OFICIAL</p>
             <h2 class="print-body-title">Reporte General de Préstamos de Equipo</h2>
             <p class="print-body-subtitle">Panel de Control y Monitoreo Institucional — Dirección</p>
         </div>
 
-        <!-- Tabla Clásica Impresión -->
         <table>
             <thead>
                 <tr>
@@ -338,41 +333,35 @@
             <tbody>
                 {% for p in prestamos %}
                 <tr>
-                    <!-- 1. Fecha / Hora -->
                     <td>
                         {{ p.fecha_entrega|strftime('%d/%m/%Y') }}<br>
                         {{ p.fecha_entrega|strftime('%H:%M') }}
                     </td>
-                    <!-- 2. Docente / Especialidad -->
                     <td>
                         <div class="print-bold" style="max-width: 100px; word-wrap: break-word;">{{ p.profesor }}</div>
                         <div class="print-box-red">{{ p.asignatura }}</div>
                     </td>
-                    <!-- 3. N° Inventario -->
                     <td>
                         <span class="print-bold print-red">{{ p.inventario }}</span>
                     </td>
-                    <!-- 4. Estudiante / Cédula -->
                     <td>
                         <div class="print-bold" style="max-width: 110px; word-wrap: break-word;">{{ p.estudiante }}</div>
-                        <div class="print-gray" style="font-size: 7.5pt; margin-top: 4px;">Cédula:</div>
-                        <div class="print-gray" style="font-size: 7.5pt;">{{ p.cedula }}</div>
-                        <div class="print-bold" style="font-size: 7.5pt; margin-top: 4px;">Sección: {{ p.grupo }}</div>
+                        <div class="print-gray" style="font-size: 7pt; margin-top: 2px;">Cédula:</div>
+                        <div class="print-gray" style="font-size: 7pt;">{{ p.cedula }}</div>
+                        <div class="print-bold" style="font-size: 7pt; margin-top: 2px;">Sección: {{ p.grupo }}</div>
                     </td>
-                    <!-- 5. Equipo -->
                     <td>
                         <div class="print-bold" style="max-width: 100px; word-wrap: break-word;">{{ p.marca_modelo }}</div>
-                        <div class="print-gray" style="font-size: 7.5pt; margin-top: 4px;">
+                        <div class="print-gray" style="font-size: 7pt; margin-top: 2px;">
                             Cargador: {{ p.cargador_entregado }} |<br>Caja: {{ p.caja_entregada }}
                         </div>
                     </td>
-                    <!-- 6. Estado Estudiante -->
                     <td>
                         {% if p.confirmado_estudiante %}
                             <div>
                                 <span class="print-pill-green">✓ Confirmado</span>
                                 {% if p.fecha_reporte %}
-                                    <div class="print-gray" style="font-size: 7pt; margin-top: 4px; padding-left: 2px;">
+                                    <div class="print-gray" style="font-size: 6.5pt; margin-top: 2px; padding-left: 2px;">
                                         {{ p.fecha_reporte|strftime('%d/%m/%Y %H:%M') }}
                                     </div>
                                 {% endif %}
@@ -381,7 +370,6 @@
                             <span class="print-pill-orange">En Espera</span>
                         {% endif %}
                     </td>
-                    <!-- 7. Observaciones -->
                     <td>
                         <span class="print-italic print-gray">{{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}</span>
                     </td>
