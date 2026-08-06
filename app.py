@@ -2,6 +2,7 @@ import os
 import re
 from io import BytesIO
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 from flask_sqlalchemy import SQLAlchemy
 import openpyxl
@@ -13,6 +14,10 @@ app.secret_key = os.environ.get('SECRET_KEY', 'spet-clave-secret-2026')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bitacora.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Función auxiliar para obtener la hora exacta de Costa Rica (sin tzinfo para compatibilidad limpia con SQLite)
+def hora_cr():
+    return datetime.now(ZoneInfo("America/Costa_Rica")).replace(tzinfo=None)
 
 class Prestamo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +31,7 @@ class Prestamo(db.Model):
     cargador_entregado = db.Column(db.String(10), default="Sí")
     caja_entregada = db.Column(db.String(10), default="Sí")
     estado_inicial = db.Column(db.String(200), default="Excelente estado")
-    fecha_entrega = db.Column(db.DateTime, default=datetime.now)
+    fecha_entrega = db.Column(db.DateTime, default=hora_cr)
     
     confirmado_estudiante = db.Column(db.Boolean, default=False)
     cargador_recibido = db.Column(db.String(10), nullable=True)
@@ -92,7 +97,7 @@ def vista_direccion():
                            todas_asignaturas=todas_asignaturas,
                            asignatura_filtro=asignatura_filtro,
                            fecha_inicio=fecha_inicio, fecha_fin=fecha_fin,
-                           ahora=datetime.now())
+                           ahora=hora_cr())
 
 @app.route('/descargar_reporte')
 def descargar_reporte():
@@ -169,7 +174,7 @@ def descargar_reporte():
     wb.save(output)
     output.seek(0)
 
-    nombre_archivo = f"Reporte_Prestamos_{datetime.now().strftime('%Y_%m_%d')}.xlsx"
+    nombre_archivo = f"Reporte_Prestamos_{hora_cr().strftime('%Y_%m_%d')}.xlsx"
     return send_file(
         output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -201,7 +206,7 @@ def vista_profesor():
             cargador_entregado=request.form.get('cargador', 'No'),
             caja_entregada=request.form.get('caja', 'No'),
             estado_inicial=request.form['estado_inicial'].strip()[:200],
-            fecha_entrega=datetime.now()
+            fecha_entrega=hora_cr()
         )
         db.session.add(nuevo_prestamo)
         db.session.commit()
@@ -264,7 +269,7 @@ def vista_estudiante():
         prestamo.cargador_recibido = request.form.get('cargador_recibido', 'No')
         reporte = request.form.get('reporte', '').strip()[:300]
         prestamo.reporte_estudiante = reporte
-        prestamo.fecha_reporte = datetime.now()
+        prestamo.fecha_reporte = hora_cr()
         prestamo.novedad_detectada = True if (len(reporte) > 0 or prestamo.cargador_recibido == 'No') else False
             
         db.session.commit()
