@@ -138,7 +138,6 @@ def descargar_reporte():
     headers = ['ID', 'Fecha Entrega', 'Docente', 'Asignatura', 'Inventario', 'Equipo', 'Cédula', 'Estudiante', 'Sección', 'Cargador', 'Caja', 'Estado', 'Confirmado', 'Fecha Conf.', 'Obs']
     ws.append(headers)
     
-    # Estilos simples para Excel
     header_font = Font(bold=True, color="FFFFFF")
     header_fill = PatternFill(start_color="990000", end_color="990000", fill_type="solid")
     for cell in ws[1]:
@@ -146,7 +145,16 @@ def descargar_reporte():
         cell.fill = header_fill
 
     for p in prestamos:
-        ws.append([p.id, p.fecha_entrega.strftime('%d/%m/%Y %H:%M') if p.fecha_entrega else '', p.profesor, p.asignatura, p.inventario, p.marca_modelo, p.cedula, p.estudiante, p.grupo, p.cargador_entregado, p.caja_entregada, p.estado_inicial, 'Sí' if p.confirmado_estudiante else 'No', p.fecha_reporte.strftime('%d/%m/%Y %H:%M') if p.fecha_reporte else '', p.reporte_estudiante])
+        ws.append([
+            p.id, 
+            p.fecha_entrega.strftime('%d/%m/%Y %H:%M') if p.fecha_entrega else '', 
+            p.profesor, p.asignatura, p.inventario, p.marca_modelo, 
+            p.cedula, p.estudiante, p.grupo, p.cargador_entregado, 
+            p.caja_entregada, p.estado_inicial, 
+            'Sí' if p.confirmado_estudiante else 'No', 
+            p.fecha_reporte.strftime('%d/%m/%Y %H:%M') if p.fecha_reporte else '', 
+            p.reporte_estudiante
+        ])
 
     output = BytesIO()
     wb.save(output)
@@ -190,30 +198,36 @@ def eliminar_prestamo(id):
     prestamo = Prestamo.query.get_or_404(id)
     db.session.delete(prestamo)
     db.session.commit()
-    # Redirección inteligente que mantiene filtros
     return redirect(request.referrer or url_for('vista_direccion'))
 
-@app.route('/importar_datos')
-def importar_datos():
-    archivo = 'respaldo_datos.xlsx'
-    if not os.path.exists(archivo): return "Archivo no encontrado en raíz."
-    wb = openpyxl.load_workbook(archivo)
-    ws = wb.active
-    contador = 0
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        nuevo = Prestamo(
-            fecha_entrega=datetime.strptime(str(row[1]), '%d/%m/%Y %H:%M'),
-            profesor=str(row[2]), asignatura=str(row[3]), inventario=str(row[4]),
-            marca_modelo=str(row[5]), cedula=str(row[6]), estudiante=str(row[7]),
-            grupo=str(row[8]), cargador_entregado=str(row[9]),
-            caja_entregada=str(row[10]), estado_inicial=str(row[11]),
-            confirmado_estudiante=(row[12]=='Sí'),
-            reporte_estudiante=str(row[14]) if row[14] else ""
-        )
-        db.session.add(nuevo)
-        contador += 1
-    db.session.commit()
-    return f"Importados {contador} registros."
+@app.route('/estudiante', methods=['GET', 'POST'])
+@app.route('/reportar', methods=['GET', 'POST'])
+def vista_estudiante():
+    inv_query_raw = request.args.get('inv', '').strip()
+    inv_query = formatear_inventario(inv_query_raw) if inv_query_raw else ''
+    
+    if request.method == 'POST':
+        inv_post = request.form.get('inventario', '').strip()
+        inv_final = formatear_inventario(inv_post)
+        
+        prestamo = Prestamo.query.filter_by(inventario=inv_final).order_by(Prestamo.id.desc()).first()
+        if not prestamo:
+            return redirect(url_for('vista_estudiante', inv=inv_post))
+            
+        prestamo.confirmado_estudiante = True
+        prestamo.cargador_recibido = request.form.get('cargador_recibido', 'No')
+        reporte = request.form.get('reporte', '').strip()[:300]
+        prestamo.reporte_estudiante = reporte
+        prestamo.fecha_reporte = hora_cr()
+        prestamo.novedad_detectada = True if (len(reporte) > 0 or prestamo.cargador_recibido == 'No') else False
+            
+        db.session.commit()
+        return render_template('confirmacion.html', prestamo=prestamo)
+        
+    prestamo_actual = None
+    if inv_query:
+        prestamo_actual = Prestamo.query.filter_by(inventario=inv_query).order_by(Prestamo.id.desc()).first()
+    return render_template('estudiante.html', inv_query=inv_query_raw, prestamo=prestamo_actual)
 
 if __name__ == '__main__':
     app.run(debug=True)
