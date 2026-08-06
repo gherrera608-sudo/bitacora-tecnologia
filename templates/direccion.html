@@ -62,7 +62,7 @@
                 color: #111 !important;
             }
             
-            /* Anchos de columna para forzar los saltos de línea exactos de la imagen */
+            /* Anchos de columna */
             .w-col-1 { width: 9%; }
             .w-col-2 { width: 16%; }
             .w-col-3 { width: 11%; }
@@ -71,7 +71,6 @@
             .w-col-6 { width: 16%; }
             .w-col-7 { width: 18%; }
             
-            /* Textos y Etiquetas */
             .print-bold { font-weight: bold !important; }
             .print-red { color: #cc0000 !important; }
             .print-gray { color: #555 !important; }
@@ -87,7 +86,7 @@
                 display: inline-block !important;
                 margin-top: 6px !important;
                 text-align: center !important;
-                max-width: 85px !important; /* Fuerza salto ej: Tecnología \n Informática */
+                max-width: 85px !important;
             }
             
             .print-pill-green {
@@ -113,146 +112,160 @@
         .print-only { display: none; }
     </style>
 </head>
-<body class="bg-[#121212] min-h-screen text-gray-100 font-sans antialiased pb-12">
+<body class="bg-[#121212] min-h-screen text-gray-900 font-sans antialiased pb-12">
 
     <!-- ======================================================= -->
-    <!-- 1. VISTA DE PANTALLA (MODO OSCURO - OCULTO AL IMPRIMIR) -->
+    <!-- 1. VISTA DE PANTALLA (BLANCA / CLARA - OCULTO AL IMPRIMIR) -->
     <!-- ======================================================= -->
     <div class="screen-only">
-        <!-- Navbar Superior -->
-        <header class="bg-black text-white border-b border-neutral-800 px-6 py-3 mb-8 shadow-md">
-            <div class="max-w-[1400px] mx-auto flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-neutral-900 border border-neutral-700 rounded flex items-center justify-center p-1">
-                        <img src="{{ url_for('static', filename='escudo.png') }}" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/40'">
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-red-600 font-black tracking-wider text-base">SPET</span>
-                            <span class="text-neutral-500">|</span>
-                            <h1 class="text-sm font-semibold text-neutral-200">Liceo Monseñor Rubén Odio Herrera</h1>
-                        </div>
-                        <p class="text-[11px] text-neutral-400">Sistema de Préstamo de Equipo Tecnológico</p>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="max-w-[1400px] mx-auto px-4 space-y-6">
+        <main class="max-w-[1400px] mx-auto px-4 pt-8 space-y-6">
+            
             <!-- Panel de Control y Filtros -->
-            <section class="bg-[#1a1a1a] rounded-2xl p-6 shadow-2xl border border-neutral-800">
+            <section class="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
                     <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <div class="w-1 h-3.5 bg-red-600 rounded-full"></div>
-                            <span class="text-[10px] font-bold text-red-500 uppercase tracking-wider">INFORME OFICIAL</span>
+                        <div class="mb-2">
+                            <span class="bg-red-50 text-red-600 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider border border-red-100">
+                                INFORME OFICIAL
+                            </span>
                         </div>
-                        <h2 class="text-2xl font-black text-white tracking-tight">Reporte General de Préstamos de Equipo</h2>
-                        <p class="text-xs font-medium text-neutral-400">Panel de Control y Monitoreo Institucional — Dirección</p>
+                        <h2 class="text-2xl font-black text-gray-900 tracking-tight">Reporte General de Préstamos de Equipo</h2>
+                        <p class="text-xs font-medium text-gray-500 mt-1">Panel de Control y Monitoreo Institucional — Dirección</p>
                     </div>
 
                     <!-- Botones y Métricas -->
                     <div class="flex flex-wrap items-center gap-3">
-                        <button onclick="window.print()" class="bg-[#262626] hover:bg-neutral-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-neutral-700 shadow-sm">
-                            🖨️ Imprimir
+                        <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                            Imprimir
                         </button>
-                        <a href="{{ url_for('descargar_reporte', asignatura=asignatura_filtro, grupo=grupo_filtro, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" class="bg-[#007a4d] hover:bg-[#00633e] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                            📊 Exportar a Excel
+                        <a href="{{ url_for('descargar_reporte', asignatura=asignatura_filtro, grupo=grupo_filtro, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" class="bg-[#007a4d] hover:bg-[#00633e] text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Exportar a Excel
                         </a>
 
                         <div class="flex items-center gap-2 ml-2">
-                            <div class="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
-                                <span class="block text-[9px] font-bold text-neutral-400 tracking-wider">TOTAL</span>
-                                <span class="text-base font-black text-white">{{ total }}</span>
+                            <div class="bg-white border border-gray-200 rounded-lg px-4 py-1.5 text-center min-w-[70px]">
+                                <span class="block text-[9px] font-bold text-gray-400 tracking-wider">TOTAL</span>
+                                <span class="text-base font-black text-gray-900">{{ total }}</span>
                             </div>
-                            <div class="bg-emerald-950/40 border border-emerald-900/50 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
-                                <span class="block text-[9px] font-bold text-emerald-400 tracking-wider">RECIBIDOS</span>
-                                <span class="text-base font-black text-emerald-300">{{ confirmados }}</span>
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-1.5 text-center min-w-[70px]">
+                                <span class="block text-[9px] font-bold text-emerald-600 tracking-wider">RECIBIDOS</span>
+                                <span class="text-base font-black text-emerald-700">{{ confirmados }}</span>
                             </div>
-                            <div class="bg-red-950/40 border border-red-900/50 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
-                                <span class="block text-[9px] font-bold text-red-400 tracking-wider">NOVEDADES</span>
-                                <span class="text-base font-black text-red-300">{{ novedades }}</span>
+                            <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-1.5 text-center min-w-[70px]">
+                                <span class="block text-[9px] font-bold text-red-600 tracking-wider">NOVEDADES</span>
+                                <span class="text-base font-black text-red-700">{{ novedades }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <hr class="border-neutral-800 my-4">
+                <hr class="border-gray-100 my-4">
 
                 <!-- Formulario de Filtros -->
                 <form method="GET" action="{{ url_for('vista_direccion') }}" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                     <div class="md:col-span-3">
-                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Especialidad / Asignatura</label>
-                        <select name="asignatura" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Especialidad / Asignatura</label>
+                        <select name="asignatura" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-medium text-gray-800 focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition">
                             <option value="">Todas las asignaturas</option>
                             {% for a in todas_asignaturas %}<option value="{{ a }}" {% if asignatura_filtro == a %}selected{% endif %}>{{ a }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Sección</label>
-                        <select name="grupo" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Sección</label>
+                        <select name="grupo" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-medium text-gray-800 focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition">
                             <option value="">Todas las secciones</option>
                             {% for g in todos_grupos %}<option value="{{ g }}" {% if grupo_filtro == g %}selected{% endif %}>{{ g }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Desde</label>
-                        <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Desde</label>
+                        <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-800 focus:ring-2 focus:ring-red-600 outline-none transition">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Hasta</label>
-                        <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Hasta</label>
+                        <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-800 focus:ring-2 focus:ring-red-600 outline-none transition">
                     </div>
                     <div class="md:col-span-3 flex items-center gap-2">
                         <button type="submit" class="flex-1 bg-[#be121c] hover:bg-[#a10e16] text-white font-bold py-2 px-4 rounded-lg text-xs transition shadow-sm">Aplicar Filtros</button>
-                        <a href="{{ url_for('vista_direccion') }}" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 p-2 rounded-lg transition" title="Limpiar Filtros">🔄</a>
+                        <a href="{{ url_for('vista_direccion') }}" class="bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-600 p-2 rounded-lg transition" title="Limpiar Filtros">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </a>
                     </div>
                 </form>
             </section>
 
-            <!-- Tabla de Registros Oscura -->
-            <section class="bg-[#1a1a1a] rounded-2xl shadow-2xl border border-neutral-800 overflow-hidden">
+            <!-- Tabla de Registros Blanca -->
+            <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-neutral-800 text-[10px] font-black text-neutral-400 tracking-wider uppercase bg-neutral-900/60">
-                                <th class="py-3.5 px-4">FECHA / HORA</th>
-                                <th class="py-3.5 px-4">DOCENTE / ESPECIALIDAD</th>
-                                <th class="py-3.5 px-4">N° INVENTARIO</th>
-                                <th class="py-3.5 px-4">ESTUDIANTE / CÉDULA</th>
-                                <th class="py-3.5 px-4">EQUIPO</th>
-                                <th class="py-3.5 px-4 text-center">ESTADO ESTUDIANTE</th>
-                                <th class="py-3.5 px-4">OBSERVACIONES / REPORTE</th>
-                                <th class="py-3.5 px-4 text-center">ACCIONES</th>
+                            <tr class="border-b border-gray-200 text-[10px] font-black text-gray-500 tracking-wider uppercase bg-white">
+                                <th class="py-4 px-4">FECHA / HORA</th>
+                                <th class="py-4 px-4">DOCENTE / ESPECIALIDAD</th>
+                                <th class="py-4 px-4">N° INVENTARIO</th>
+                                <th class="py-4 px-4">ESTUDIANTE / CÉDULA</th>
+                                <th class="py-4 px-4">EQUIPO</th>
+                                <th class="py-4 px-4 text-center">ESTADO ESTUDIANTE</th>
+                                <th class="py-4 px-4">OBSERVACIONES / REPORTE</th>
+                                <th class="py-4 px-4 text-center">ACCIONES</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-neutral-800/60 text-xs">
+                        <tbody class="divide-y divide-gray-100 text-xs">
                             {% for p in prestamos %}
-                            <tr class="hover:bg-neutral-900/40 transition">
-                                <td class="py-3.5 px-4 font-medium text-neutral-300 whitespace-nowrap">{{ p.fecha_entrega|strftime('%d/%m/%Y') }}<br><span class="text-[11px] text-neutral-500">{{ p.fecha_entrega|strftime('%H:%M') }}</span></td>
-                                <td class="py-3.5 px-4">
-                                    <span class="font-bold text-white block">{{ p.profesor }}</span>
-                                    <span class="inline-block bg-neutral-900 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-neutral-800 mt-0.5">{{ p.asignatura }}</span>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="py-4 px-4 whitespace-nowrap">
+                                    <span class="font-medium text-gray-600">{{ p.fecha_entrega|strftime('%d/%m/%Y') }}</span><br>
+                                    <span class="text-[11px] text-gray-400">{{ p.fecha_entrega|strftime('%H:%M') }}</span>
                                 </td>
-                                <td class="py-3.5 px-4 font-black text-red-500 tracking-tight whitespace-nowrap">{{ p.inventario }}</td>
-                                <td class="py-3.5 px-4">
-                                    <span class="font-bold text-white block">{{ p.estudiante }}</span>
-                                    <div class="text-[11px] text-neutral-400 flex items-center gap-1.5 mt-0.5"><span>Cédula: {{ p.cedula }}</span><span class="inline-block bg-neutral-900 text-neutral-300 font-bold px-1.5 py-0.2 rounded text-[10px] border border-neutral-800">Sección: {{ p.grupo }}</span></div>
+                                <td class="py-4 px-4">
+                                    <span class="font-bold text-gray-900 block">{{ p.profesor }}</span>
+                                    <span class="inline-block bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded border border-red-100 mt-1">
+                                        {{ p.asignatura }}
+                                    </span>
                                 </td>
-                                <td class="py-3.5 px-4"><span class="font-semibold text-neutral-200 block">{{ p.marca_modelo }}</span><span class="text-[11px] text-neutral-400">Cargador: <strong class="text-neutral-200">{{ p.cargador_entregado }}</strong> | Caja: <strong class="text-neutral-200">{{ p.caja_entregada }}</strong></span></td>
-                                <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                <td class="py-4 px-4 font-black text-red-600 tracking-tight whitespace-nowrap">{{ p.inventario }}</td>
+                                <td class="py-4 px-4">
+                                    <span class="font-bold text-gray-900 block">{{ p.estudiante }}</span>
+                                    <div class="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                        <span>Cédula: {{ p.cedula }}</span>
+                                        <span class="inline-block bg-gray-100 text-gray-600 font-bold px-1.5 py-0.5 rounded text-[10px] border border-gray-200">Sección: {{ p.grupo }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4">
+                                    <span class="font-semibold text-gray-900 block">{{ p.marca_modelo }}</span>
+                                    <span class="text-[11px] text-gray-500">
+                                        Cargador: <strong class="text-gray-800">{{ p.cargador_entregado }}</strong> | Caja: <strong class="text-gray-800">{{ p.caja_entregada }}</strong>
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-center whitespace-nowrap">
                                     {% if p.confirmado_estudiante %}
-                                        <span class="inline-flex items-center gap-1 bg-emerald-950/60 text-emerald-300 font-bold text-[11px] px-3 py-1 rounded-full border border-emerald-800">✓ Confirmado</span>
-                                        {% if p.fecha_reporte %}<span class="block text-[10px] text-neutral-500 mt-1">{{ p.fecha_reporte|strftime('%d/%m/%Y %H:%M') }}</span>{% endif %}
+                                        <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 font-bold text-[11px] px-3 py-1.5 rounded-full border border-emerald-200">
+                                            ✓ Confirmado
+                                        </span>
+                                        {% if p.fecha_reporte %}<span class="block text-[10px] text-gray-400 mt-1">{{ p.fecha_reporte|strftime('%d/%m/%Y %H:%M') }}</span>{% endif %}
                                     {% else %}
-                                        <span class="inline-block bg-amber-950/60 text-amber-300 font-bold text-[11px] px-3 py-1 rounded-full border border-amber-800">En Espera</span>
+                                        <span class="inline-block bg-amber-50 text-amber-600 font-bold text-[11px] px-3 py-1.5 rounded-full border border-amber-200">
+                                            En Espera
+                                        </span>
                                     {% endif %}
                                 </td>
-                                <td class="py-3.5 px-4 text-neutral-400 italic">{{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}</td>
-                                <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg border border-neutral-700 transition" title="Editar">✏️</a>
-                                        <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este registro?')"><button type="submit" class="p-1.5 text-neutral-300 hover:text-red-400 hover:bg-red-950/50 rounded-lg border border-neutral-700 transition" title="Eliminar">🗑️</button></form>
+                                <td class="py-4 px-4 text-gray-400 italic">
+                                    {{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}
+                                </td>
+                                <td class="py-4 px-4 text-center whitespace-nowrap">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <!-- Botón Editar -->
+                                        <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-md transition" title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                        </a>
+                                        <!-- Botón Eliminar -->
+                                        <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este registro?')">
+                                            <button type="submit" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 border border-gray-200 rounded-md transition" title="Eliminar">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -265,7 +278,7 @@
     </div>
 
     <!-- ======================================================= -->
-    <!-- 2. VISTA EXCLUSIVA DE IMPRESIÓN (IDÉNTICA A LA IMAGEN)  -->
+    <!-- 2. VISTA EXCLUSIVA DE IMPRESIÓN (IDÉNTICA AL FORMATO PDF) -->
     <!-- ======================================================= -->
     <div class="print-only print-container">
         
@@ -274,7 +287,6 @@
             <div class="print-header-left">
                 <img src="{{ url_for('static', filename='escudo.png') }}" class="print-logo">
                 <div>
-                    <!-- El texto erróneo fue eliminado permanentemente de aquí -->
                     <h1 class="print-school-name">LICEO MONSEÑOR RUBÉN ODIO HERRERA</h1>
                     <p class="print-system-name">Sistema de Préstamo de Equipo Tecnológico (SPET)</p>
                 </div>
@@ -292,7 +304,7 @@
             <p class="print-body-subtitle">Panel de Control y Monitoreo Institucional — Dirección</p>
         </div>
 
-        <!-- Tabla Clásica -->
+        <!-- Tabla Clásica Impresión -->
         <table>
             <thead>
                 <tr>
@@ -313,18 +325,15 @@
                         {{ p.fecha_entrega|strftime('%d/%m/%Y') }}<br>
                         {{ p.fecha_entrega|strftime('%H:%M') }}
                     </td>
-                    
                     <!-- 2. Docente / Especialidad -->
                     <td>
                         <div class="print-bold" style="max-width: 100px; word-wrap: break-word;">{{ p.profesor }}</div>
                         <div class="print-box-red">{{ p.asignatura }}</div>
                     </td>
-                    
                     <!-- 3. N° Inventario -->
                     <td>
                         <span class="print-bold print-red">{{ p.inventario }}</span>
                     </td>
-                    
                     <!-- 4. Estudiante / Cédula -->
                     <td>
                         <div class="print-bold" style="max-width: 110px; word-wrap: break-word;">{{ p.estudiante }}</div>
@@ -332,7 +341,6 @@
                         <div class="print-gray" style="font-size: 7.5pt;">{{ p.cedula }}</div>
                         <div class="print-bold" style="font-size: 7.5pt; margin-top: 4px;">Sección: {{ p.grupo }}</div>
                     </td>
-                    
                     <!-- 5. Equipo -->
                     <td>
                         <div class="print-bold" style="max-width: 100px; word-wrap: break-word;">{{ p.marca_modelo }}</div>
@@ -340,7 +348,6 @@
                             Cargador: {{ p.cargador_entregado }} |<br>Caja: {{ p.caja_entregada }}
                         </div>
                     </td>
-                    
                     <!-- 6. Estado Estudiante -->
                     <td>
                         {% if p.confirmado_estudiante %}
@@ -356,7 +363,6 @@
                             <span class="print-pill-orange">En Espera</span>
                         {% endif %}
                     </td>
-                    
                     <!-- 7. Observaciones -->
                     <td>
                         <span class="print-italic print-gray">{{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}</span>
