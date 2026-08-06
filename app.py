@@ -72,41 +72,25 @@ def vista_direccion():
     fecha_inicio = request.args.get('fecha_inicio', '')
     fecha_fin = request.args.get('fecha_fin', '')
     
-    if asignatura_filtro:
-        query = query.filter_by(asignatura=asignatura_filtro)
-    if grupo_filtro:
-        query = query.filter_by(grupo=grupo_filtro)
-        
+    if asignatura_filtro: query = query.filter_by(asignatura=asignatura_filtro)
+    if grupo_filtro: query = query.filter_by(grupo=grupo_filtro)
     if fecha_inicio:
-        try:
-            dt_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d')
-            query = query.filter(Prestamo.fecha_entrega >= dt_inicio)
-        except ValueError:
-            pass
-            
+        try: query = query.filter(Prestamo.fecha_entrega >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        except: pass
     if fecha_fin:
-        try:
-            dt_fin = datetime.strptime(fecha_fin + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
-            query = query.filter(Prestamo.fecha_entrega <= dt_fin)
-        except ValueError:
-            pass
+        try: query = query.filter(Prestamo.fecha_entrega <= datetime.strptime(fecha_fin + ' 23:59:59', '%Y-%m-%d %H:%M:%S'))
+        except: pass
             
     prestamos = query.order_by(Prestamo.id.desc()).all()
     todas_asignaturas = [a[0] for a in db.session.query(Prestamo.asignatura).distinct().all() if a[0]]
     todos_grupos = [g[0] for g in db.session.query(Prestamo.grupo).distinct().all() if g[0]]
     
-    total = len(prestamos)
-    novedades = sum(1 for p in prestamos if p.novedad_detectada)
-    confirmados = sum(1 for p in prestamos if p.confirmado_estudiante)
-    
-    return render_template('direccion.html', prestamos=prestamos, total=total, 
-                           novedades=novedades, confirmados=confirmados, 
-                           todas_asignaturas=todas_asignaturas,
-                           todos_grupos=todos_grupos,
-                           asignatura_filtro=asignatura_filtro,
-                           grupo_filtro=grupo_filtro,
-                           fecha_inicio=fecha_inicio, fecha_fin=fecha_fin,
-                           ahora=hora_cr())
+    return render_template('direccion.html', prestamos=prestamos, total=len(prestamos), 
+                           novedades=sum(1 for p in prestamos if p.novedad_detectada), 
+                           confirmados=sum(1 for p in prestamos if p.confirmado_estudiante), 
+                           todas_asignaturas=todas_asignaturas, todos_grupos=todos_grupos,
+                           asignatura_filtro=asignatura_filtro, grupo_filtro=grupo_filtro,
+                           fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, ahora=hora_cr())
 
 @app.route('/descargar_reporte')
 def descargar_reporte():
@@ -119,42 +103,20 @@ def descargar_reporte():
     if asignatura_filtro: query = query.filter_by(asignatura=asignatura_filtro)
     if grupo_filtro: query = query.filter_by(grupo=grupo_filtro)
     if fecha_inicio:
-        try:
-            dt_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d')
-            query = query.filter(Prestamo.fecha_entrega >= dt_inicio)
-        except ValueError: pass
+        try: query = query.filter(Prestamo.fecha_entrega >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        except: pass
     if fecha_fin:
-        try:
-            dt_fin = datetime.strptime(fecha_fin + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
-            query = query.filter(Prestamo.fecha_entrega <= dt_fin)
-        except ValueError: pass
+        try: query = query.filter(Prestamo.fecha_entrega <= datetime.strptime(fecha_fin + ' 23:59:59', '%Y-%m-%d %H:%M:%S'))
+        except: pass
 
     prestamos = query.order_by(Prestamo.id.desc()).all()
-
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Reporte Préstamos"
-
-    headers = ['ID', 'Fecha Entrega', 'Docente', 'Asignatura', 'Inventario', 'Equipo', 'Cédula', 'Estudiante', 'Sección', 'Cargador', 'Caja', 'Estado', 'Confirmado', 'Fecha Conf.', 'Obs']
-    ws.append(headers)
+    ws.append(['ID', 'Fecha', 'Docente', 'Asignatura', 'Inventario', 'Equipo', 'Cédula', 'Estudiante', 'Sección', 'Cargador', 'Caja', 'Estado', 'Confirmado', 'Fecha Conf.', 'Obs'])
     
-    header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(start_color="990000", end_color="990000", fill_type="solid")
-    for cell in ws[1]:
-        cell.font = header_font
-        cell.fill = header_fill
-
     for p in prestamos:
-        ws.append([
-            p.id, 
-            p.fecha_entrega.strftime('%d/%m/%Y %H:%M') if p.fecha_entrega else '', 
-            p.profesor, p.asignatura, p.inventario, p.marca_modelo, 
-            p.cedula, p.estudiante, p.grupo, p.cargador_entregado, 
-            p.caja_entregada, p.estado_inicial, 
-            'Sí' if p.confirmado_estudiante else 'No', 
-            p.fecha_reporte.strftime('%d/%m/%Y %H:%M') if p.fecha_reporte else '', 
-            p.reporte_estudiante
-        ])
+        ws.append([p.id, p.fecha_entrega.strftime('%d/%m/%Y %H:%M') if p.fecha_entrega else '', p.profesor, p.asignatura, p.inventario, p.marca_modelo, p.cedula, p.estudiante, p.grupo, p.cargador_entregado, p.caja_entregada, p.estado_inicial, 'Sí' if p.confirmado_estudiante else 'No', p.fecha_reporte.strftime('%d/%m/%Y %H:%M') if p.fecha_reporte else '', p.reporte_estudiante])
 
     output = BytesIO()
     wb.save(output)
@@ -195,8 +157,7 @@ def editar_prestamo(id):
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
 def eliminar_prestamo(id):
-    prestamo = Prestamo.query.get_or_404(id)
-    db.session.delete(prestamo)
+    db.session.delete(Prestamo.query.get_or_404(id))
     db.session.commit()
     return redirect(request.referrer or url_for('vista_direccion'))
 
@@ -211,10 +172,16 @@ def vista_estudiante():
         inv_final = formatear_inventario(inv_post)
         cedula_ingresada = limpiar_cedula(request.form.get('cedula', ''))
         
-        # Validación de seguridad estricta: Inventario + Cédula obligatorios
-        prestamo = Prestamo.query.filter_by(inventario=inv_final, cedula=cedula_ingresada).order_by(Prestamo.id.desc()).first()
+        # VALIDACIÓN DE SEGURIDAD PARA EQUIPOS COMPARTIDOS
+        # Buscamos SOLO el préstamo NO confirmado (False) que coincida con este inventario Y esta cédula
+        prestamo = Prestamo.query.filter_by(
+            inventario=inv_final, 
+            cedula=cedula_ingresada, 
+            confirmado_estudiante=False
+        ).first()
+        
         if not prestamo:
-            flash("El número de inventario o la cédula no coinciden con nuestros registros.", "danger")
+            flash("Error: El inventario no tiene préstamos pendientes para esta cédula o los datos son incorrectos.", "danger")
             return redirect(url_for('vista_estudiante', inv=inv_post))
             
         prestamo.confirmado_estudiante = True
@@ -229,7 +196,12 @@ def vista_estudiante():
         
     prestamo_actual = None
     if inv_query:
-        prestamo_actual = Prestamo.query.filter_by(inventario=inv_query).order_by(Prestamo.id.desc()).first()
+        # Buscamos el préstamo más reciente que aún no esté confirmado
+        prestamo_actual = Prestamo.query.filter_by(
+            inventario=inv_query, 
+            confirmado_estudiante=False
+        ).order_by(Prestamo.id.desc()).first()
+        
     return render_template('estudiante.html', inv_query=inv_query_raw, prestamo=prestamo_actual)
 
 if __name__ == '__main__':
