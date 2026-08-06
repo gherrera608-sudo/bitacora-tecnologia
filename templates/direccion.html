@@ -2,113 +2,211 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte General - Dirección</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPET - Reporte General de Préstamos</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 p-6">
+<body class="bg-[#121212] min-h-screen text-gray-800 font-sans antialiased pb-12">
 
-<div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-    <!-- Header -->
-    <div class="mb-6">
-        <span class="text-red-800 text-xs font-bold uppercase tracking-wider bg-red-100 px-2 py-1 rounded">Informe Oficial</span>
-        <h1 class="text-2xl font-bold text-gray-900 mt-2">Reporte General de Préstamos de Equipo</h1>
-        <p class="text-sm text-gray-500">Panel de Control y Monitoreo Institucional — Dirección</p>
-    </div>
-
-    <!-- Botones Superiores -->
-    <div class="flex gap-4 mb-6">
-        <a href="javascript:window.print()" class="bg-gray-800 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-black">Imprimir</a>
-        <a href="{{ url_for('descargar_reporte', asignatura=asignatura_filtro, grupo=grupo_filtro, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" class="bg-green-700 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-green-800">Exportar a Excel</a>
-        <div class="ml-auto flex gap-2">
-            <div class="border px-4 py-2 rounded text-center"><span class="block text-xs text-gray-500">TOTAL</span><span class="font-bold text-lg">{{ total }}</span></div>
-            <div class="border px-4 py-2 rounded text-center border-green-200 bg-green-50"><span class="block text-xs text-green-700">RECIBIDOS</span><span class="font-bold text-lg text-green-700">{{ confirmados }}</span></div>
-            <div class="border px-4 py-2 rounded text-center border-red-200 bg-red-50"><span class="block text-xs text-red-700">NOVEDADES</span><span class="font-bold text-lg text-red-700">{{ novedades }}</span></div>
+    <!-- Navbar Superior Institucional -->
+    <header class="bg-black text-white border-b border-neutral-800 px-6 py-3 mb-8">
+        <div class="max-w-[1400px] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- Escudo / Logo -->
+                <div class="w-10 h-10 bg-neutral-900 border border-neutral-700 rounded flex items-center justify-center p-1">
+                    <img src="{{ url_for('static', filename='escudo.png') }}" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/40'">
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-red-600 font-black tracking-wider text-base">SPET</span>
+                        <span class="text-neutral-500">|</span>
+                        <h1 class="text-sm font-semibold text-neutral-200">Liceo Monseñor Ruben Odio Herrera</h1>
+                    </div>
+                    <p class="text-[11px] text-neutral-400">Sistema de Préstamo de Equipo Tecnológico</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Filtros -->
-    <form method="GET" action="{{ url_for('vista_direccion') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 items-end">
-        <!-- Filtro Asignatura -->
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Especialidad / Asignatura</label>
-            <select name="asignatura" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm bg-white">
-                <option value="">Todas las asignaturas</option>
-                {% for a in todas_asignaturas %}
-                    <option value="{{ a }}" {% if asignatura_filtro == a %}selected{% endif %}>{{ a }}</option>
-                {% endfor %}
-            </select>
-        </div>
+    <!-- Contenedor Principal -->
+    <main class="max-w-[1400px] mx-auto px-4 space-y-6">
 
-        <!-- Filtro Sección (NUEVO) -->
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Sección</label>
-            <select name="grupo" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm bg-white">
-                <option value="">Todas las secciones</option>
-                {% for g in todos_grupos %}
-                    <option value="{{ g }}" {% if grupo_filtro == g %}selected{% endif %}>{{ g }}</option>
-                {% endfor %}
-            </select>
-        </div>
+        <!-- Panel de Control y Filtros -->
+        <section class="bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200/80">
+            <!-- Encabezado del Informe y Botones -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
+                <div>
+                    <span class="inline-block bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full mb-1">
+                        INFORME OFICIAL
+                    </span>
+                    <h2 class="text-2xl font-black text-gray-900 tracking-tight">Reporte General de Préstamos de Equipo</h2>
+                    <p class="text-xs font-medium text-gray-500">Panel de Control y Monitoreo Institucional — Dirección</p>
+                </div>
 
-        <!-- Fechas -->
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Desde</label>
-            <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm">
-        </div>
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Hasta</label>
-            <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm">
-        </div>
+                <!-- Acciones Rápidas y Métricas -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="javascript:window.print()" class="bg-[#1c1c1c] hover:bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Imprimir
+                    </a>
+                    <a href="{{ url_for('descargar_reporte', asignatura=asignatura_filtro, grupo=grupo_filtro, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" class="bg-[#007a4d] hover:bg-[#00633e] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Exportar a Excel
+                    </a>
 
-        <div class="flex gap-2">
-            <button type="submit" class="w-full bg-red-700 text-white font-bold py-2 rounded text-sm hover:bg-red-800">Aplicar Filtros</button>
-            <a href="{{ url_for('vista_direccion') }}" class="border px-3 py-2 rounded hover:bg-gray-100">🔄</a>
-        </div>
-    </form>
+                    <!-- Indicadores (KPIs) -->
+                    <div class="flex items-center gap-2 ml-2">
+                        <div class="border border-neutral-200 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
+                            <span class="block text-[9px] font-bold text-gray-400 tracking-wider">TOTAL</span>
+                            <span class="text-base font-black text-gray-800">{{ total }}</span>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
+                            <span class="block text-[9px] font-bold text-emerald-600 tracking-wider">RECIBIDOS</span>
+                            <span class="text-base font-black text-emerald-700">{{ confirmados }}</span>
+                        </div>
+                        <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
+                            <span class="block text-[9px] font-bold text-red-600 tracking-wider">NOVEDADES</span>
+                            <span class="text-base font-black text-red-700">{{ novedades }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Tabla -->
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
-            <thead class="border-b border-gray-200">
-                <tr class="text-gray-500">
-                    <th class="py-3">FECHA / HORA</th>
-                    <th class="py-3">DOCENTE / ESP.</th>
-                    <th class="py-3">N° INVENTARIO</th>
-                    <th class="py-3">ESTUDIANTE / CÉDULA</th>
-                    <th class="py-3">EQUIPO</th>
-                    <th class="py-3">ESTADO</th>
-                    <th class="py-3">OBSERVACIONES</th>
-                    <th class="py-3 text-right">ACCIONES</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for p in prestamos %}
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
-                    <td class="py-4">{{ p.fecha_entrega|strftime }}</td>
-                    <td class="py-4 font-medium">{{ p.profesor }} <br> <span class="text-xs bg-red-50 text-red-700 px-1 rounded">{{ p.asignatura }}</span></td>
-                    <td class="py-4 font-bold text-red-800">{{ p.inventario }}</td>
-                    <td class="py-4">{{ p.estudiante }} <br> <span class="text-xs text-gray-500">Cédula: {{ p.cedula }} | Sección: {{ p.grupo }}</span></td>
-                    <td class="py-4">{{ p.marca_modelo }} <br> <span class="text-xs text-gray-500">Cargador: {{ p.cargador_entregado }} | Caja: {{ p.caja_entregada }}</span></td>
-                    <td class="py-4">
-                        {% if p.confirmado_estudiante %}
-                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">✓ Confirmado</span>
-                        {% else %}
-                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">En Espera</span>
-                        {% endif %}
-                    </td>
-                    <td class="py-4 text-gray-400 italic">{{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}</td>
-                    <td class="py-4 text-right">
-                        <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="text-blue-600 hover:underline mr-2">Editar</a>
-                        <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" class="inline">
-                            <button type="submit" onclick="return confirm('¿Seguro?')" class="text-red-600 hover:underline">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+            <hr class="border-neutral-100 my-4">
+
+            <!-- Formulario de Filtros -->
+            <form method="GET" action="{{ url_for('vista_direccion') }}" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                
+                <!-- Especialidad / Asignatura -->
+                <div class="md:col-span-3">
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Especialidad / Asignatura</label>
+                    <select name="asignatura" class="w-full bg-gray-50/50 border border-gray-300 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-red-500 focus:bg-white transition outline-none">
+                        <option value="">Todas las asignaturas</option>
+                        {% for a in todas_asignaturas %}
+                            <option value="{{ a }}" {% if asignatura_filtro == a %}selected{% endif %}>{{ a }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sección / Grupo -->
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Sección</label>
+                    <select name="grupo" class="w-full bg-gray-50/50 border border-gray-300 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-red-500 focus:bg-white transition outline-none">
+                        <option value="">Todas las secciones</option>
+                        {% for g in todos_grupos %}
+                            <option value="{{ g }}" {% if grupo_filtro == g %}selected{% endif %}>{{ g }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Fecha Desde -->
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Desde</label>
+                    <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="w-full bg-gray-50/50 border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-2 focus:ring-red-500 focus:bg-white transition outline-none">
+                </div>
+
+                <!-- Fecha Hasta -->
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Hasta</label>
+                    <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="w-full bg-gray-50/50 border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-2 focus:ring-red-500 focus:bg-white transition outline-none">
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="md:col-span-3 flex items-center gap-2">
+                    <button type="submit" class="flex-1 bg-[#be121c] hover:bg-[#a10e16] text-white font-bold py-2 px-4 rounded-lg text-xs transition shadow-sm">
+                        Aplicar Filtros
+                    </button>
+                    <a href="{{ url_for('vista_direccion') }}" class="bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-600 p-2 rounded-lg transition" title="Limpiar Filtros">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <!-- Tabla de Registros -->
+        <section class="bg-white rounded-2xl shadow-2xl border border-neutral-200/80 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200 text-[10px] font-black text-gray-700 tracking-wider uppercase bg-gray-50/50">
+                            <th class="py-3.5 px-4">FECHA / HORA</th>
+                            <th class="py-3.5 px-4">DOCENTE / ESPECIALIDAD</th>
+                            <th class="py-3.5 px-4">N° INVENTARIO</th>
+                            <th class="py-3.5 px-4">ESTUDIANTE / CÉDULA</th>
+                            <th class="py-3.5 px-4">EQUIPO</th>
+                            <th class="py-3.5 px-4 text-center">ESTADO ESTUDIANTE</th>
+                            <th class="py-3.5 px-4">OBSERVACIONES / REPORTE</th>
+                            <th class="py-3.5 px-4 text-center">ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs">
+                        {% for p in prestamos %}
+                        <tr class="hover:bg-gray-50/80 transition">
+                            <td class="py-3.5 px-4 font-medium text-gray-600 whitespace-nowrap">
+                                {{ p.fecha_entrega|strftime('%d/%m/%Y') }}<br>
+                                <span class="text-[11px] text-gray-400">{{ p.fecha_entrega|strftime('%H:%M') }}</span>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <span class="font-bold text-gray-900 block">{{ p.profesor }}</span>
+                                <span class="inline-block bg-red-50 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded border border-red-100/60 mt-0.5">
+                                    {{ p.asignatura }}
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-4 font-black text-red-600 tracking-tight whitespace-nowrap">
+                                {{ p.inventario }}
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <span class="font-bold text-gray-900 block">{{ p.estudiante }}</span>
+                                <div class="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                    <span>Cédula: {{ p.cedula }}</span>
+                                    <span class="inline-block bg-gray-100 text-gray-700 font-bold px-1.5 py-0.2 rounded text-[10px] border border-gray-200">
+                                        Sección: {{ p.grupo }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <span class="font-semibold text-gray-800 block">{{ p.marca_modelo }}</span>
+                                <span class="text-[11px] text-gray-400">
+                                    Cargador: <strong class="text-gray-700">{{ p.cargador_entregado }}</strong> | Caja: <strong class="text-gray-700">{{ p.caja_entregada }}</strong>
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                {% if p.confirmado_estudiante %}
+                                    <span class="inline-flex items-center gap-1 bg-emerald-100/80 text-emerald-800 font-bold text-[11px] px-3 py-1 rounded-full border border-emerald-200">
+                                        ✓ Confirmado
+                                    </span>
+                                    {% if p.fecha_reporte %}
+                                        <span class="block text-[10px] text-gray-400 mt-1">{{ p.fecha_reporte|strftime('%d/%m/%Y %H:%M') }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="inline-block bg-amber-100/80 text-amber-800 font-bold text-[11px] px-3 py-1 rounded-full border border-amber-200">
+                                        En Espera
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3.5 px-4 text-gray-400 italic">
+                                {{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}
+                            </td>
+                            <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="p-1.5 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg border border-gray-200 transition" title="Editar">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </a>
+                                    <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este registro?')">
+                                        <button type="submit" class="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg border border-gray-200 transition" title="Eliminar">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
 
 </body>
 </html>
