@@ -115,12 +115,32 @@
 <body class="bg-[#121212] min-h-screen text-gray-900 font-sans antialiased pb-12">
 
     <!-- ======================================================= -->
-    <!-- 1. VISTA DE PANTALLA (BLANCA / CLARA - OCULTO AL IMPRIMIR) -->
+    <!-- 1. VISTA DE PANTALLA (TARJETAS BLANCAS - OCULTO AL IMPRIMIR) -->
     <!-- ======================================================= -->
     <div class="screen-only">
-        <main class="max-w-[1400px] mx-auto px-4 pt-8 space-y-6">
+        
+        <!-- Navbar Superior (Oscura y elegante exactamente como la imagen) -->
+        <header class="bg-[#050505] text-white border-b border-red-900 py-4 shadow-lg">
+            <div class="max-w-[1400px] mx-auto px-6 flex items-center justify-center lg:justify-start">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center p-1.5 shadow-sm">
+                        <img src="{{ url_for('static', filename='escudo.png') }}" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/48'">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[#ef4444] font-black tracking-wide text-xl">SPET</span>
+                            <span class="text-neutral-600 font-light text-xl">|</span>
+                            <h1 class="text-base font-semibold text-neutral-100 tracking-wide">Liceo Monseñor Ruben Odio Herrera</h1>
+                        </div>
+                        <p class="text-[12px] text-neutral-400 mt-0.5">Sistema de Préstamo de Equipo Tecnológico</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-[1400px] mx-auto px-4 pt-6 space-y-6">
             
-            <!-- Panel de Control y Filtros -->
+            <!-- Panel de Control y Filtros (Blanco) -->
             <section class="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
                     <div>
@@ -196,7 +216,7 @@
                 </form>
             </section>
 
-            <!-- Tabla de Registros Blanca -->
+            <!-- Tabla de Registros (Blanca) -->
             <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -256,11 +276,9 @@
                                 </td>
                                 <td class="py-4 px-4 text-center whitespace-nowrap">
                                     <div class="flex items-center justify-center gap-2">
-                                        <!-- Botón Editar -->
                                         <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-md transition" title="Editar">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                         </a>
-                                        <!-- Botón Eliminar -->
                                         <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este registro?')">
                                             <button type="submit" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 border border-gray-200 rounded-md transition" title="Eliminar">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
