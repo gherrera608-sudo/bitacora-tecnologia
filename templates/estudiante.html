@@ -1,77 +1,114 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPET - Confirmación de Estudiante</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-[#121212] min-h-screen text-gray-100 flex flex-col items-center justify-center p-4">
+{% extends 'layout.html' %}
+{% block title %}Confirmación Estudiante{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto space-y-6">
 
-    <div class="w-full max-w-lg bg-[#1a1a1a] border border-neutral-800 rounded-2xl p-6 shadow-2xl">
-        <div class="flex items-center gap-2 mb-4">
-            <div class="w-1.5 h-4 bg-red-600 rounded-full"></div>
-            <h1 class="text-lg font-black text-white">Confirmación de Estudiante</h1>
+    <!-- Tarjeta Búsqueda / Consulta -->
+    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl shadow-black/40">
+        <div class="flex items-center gap-3 mb-6 pb-3 border-b border-zinc-800">
+            <div class="w-2 h-6 bg-red-600 rounded-full"></div>
+            <h1 class="text-xl font-bold text-white tracking-wide">Confirmación Estudiante</h1>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="mb-4 p-3 rounded-lg text-xs font-bold {% if category == 'danger' %}bg-red-950/60 text-red-300 border border-red-800{% else %}bg-emerald-950/60 text-emerald-300 border border-emerald-800{% endif %}">
+                    <div class="mb-4 p-3 rounded-xl text-xs font-bold {% if category == 'danger' %}bg-red-950/60 text-red-300 border border-red-800{% else %}bg-emerald-950/60 text-emerald-300 border border-emerald-800{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- Paso 1: Buscar equipo por número de inventario -->
-        <form method="GET" action="{{ url_for('vista_estudiante') }}" class="mb-6">
-            <label class="block text-xs font-bold text-neutral-300 mb-2">Digita el N° de Inventario</label>
-            <div class="flex gap-2">
-                <input type="text" name="inv" value="{{ inv_query or '' }}" placeholder="Ej: 3982-XXXX o solo los números" required class="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-white focus:ring-2 focus:ring-red-600 outline-none">
-                <button type="submit" class="bg-red-700 hover:bg-red-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition">Buscar</button>
+        <form method="GET" action="{{ url_for('vista_estudiante') }}" class="space-y-4">
+            <div>
+                <label class="text-xs font-semibold text-zinc-300">Digita el N° de Inventario</label>
+                <div class="flex gap-2 mt-1">
+                    <!-- Prefijo 3982- Fijo -->
+                    <div class="flex items-center bg-zinc-900 border border-zinc-700 focus-within:border-red-500 rounded-xl px-4 py-2.5 transition w-full">
+                        <span class="text-white font-mono font-bold text-lg select-none pr-1">3982-</span>
+                        <input type="text" name="inv" value="{{ inv_query.replace('3982-', '') if inv_query else '' }}" 
+                               placeholder="0000" 
+                               pattern="[0-9]{4}" 
+                               maxlength="4" minlength="4"
+                               inputmode="numeric"
+                               title="Ingresa únicamente los últimos 4 dígitos del número de inventario."
+                               required 
+                               class="w-full bg-transparent text-white font-mono font-bold text-lg outline-none tracking-widest placeholder-zinc-600">
+                    </div>
+
+                    <button type="submit" class="bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-md shadow-red-950/40 text-sm flex items-center justify-center">
+                        Buscar
+                    </button>
+                </div>
             </div>
         </form>
-
-        {% if prestamo %}
-        <!-- Paso 2: Formulario de confirmación con Cédula obligatoria -->
-        <form method="POST" action="{{ url_for('vista_estudiante') }}" class="space-y-4 border-t border-neutral-800 pt-4">
-            <input type="hidden" name="inventario" value="{{ prestamo.inventario }}">
-            
-            <div class="bg-neutral-900/60 p-3 rounded-xl border border-neutral-800 text-xs space-y-1">
-                <p><strong class="text-neutral-400">Estudiante:</strong> <span class="text-white font-bold">{{ prestamo.estudiante }}</span></p>
-                <p><strong class="text-neutral-400">Equipo:</strong> <span class="text-white font-semibold">{{ prestamo.marca_modelo }}</span></p>
-                <p><strong class="text-neutral-400">Inventario:</strong> <span class="text-red-500 font-bold">{{ prestamo.inventario }}</span></p>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-neutral-300 mb-1">Confirma tu Número de Cédula (Seguridad)</label>
-                <input type="text" name="cedula" placeholder="Digite su cédula sin guiones" required class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-white focus:ring-2 focus:ring-red-600 outline-none">
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-neutral-300 mb-1">¿Recibiste el cargador en buen estado?</label>
-                <select name="cargador_recibido" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-white focus:ring-2 focus:ring-red-600 outline-none">
-                    <option value="Sí">Sí, recibido correctamente</option>
-                    <option value="No">No / Viene con daño</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-neutral-300 mb-1">Observaciones o daños (Opcional)</label>
-                <textarea name="reporte" rows="2" placeholder="Ej: Pantalla rayada, sin novedades..." class="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-red-600 outline-none"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
-                Confirmar Recepción de Equipo
-            </button>
-        </form>
-        {% elif inv_query %}
-        <div class="text-center py-4 border-t border-neutral-800">
-            <p class="text-xs text-amber-400 font-semibold">No se encontró ningún préstamo activo con ese número de inventario.</p>
-        </div>
-        {% endif %}
     </div>
 
-</body>
-</html>
+    <!-- Resultados del Préstamo -->
+    {% if inv_query %}
+        {% set inv_busqueda = ('3982-' + inv_query) if not inv_query.startswith('3982') else inv_query %}
+        {% if prestamo %}
+            {% if prestamo.confirmado_estudiante %}
+                <div class="bg-zinc-950 border border-red-900/60 rounded-2xl p-6 text-center space-y-3 shadow-xl">
+                    <div class="w-12 h-12 bg-red-950/60 text-red-500 rounded-full flex items-center justify-center mx-auto text-xl border border-red-800 shadow-md shadow-red-950/50">
+                        ✓
+                    </div>
+                    <h2 class="text-lg font-black text-white">Equipo ya Confirmado</h2>
+                    <p class="text-xs text-zinc-300 leading-relaxed">
+                        El préstamo del equipo <b class="font-mono text-red-400 font-bold bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">{{ prestamo.inventario }}</b> asignado a <b class="text-white font-semibold">{{ prestamo.estudiante }}</b> ya fue registrado previamente.
+                    </p>
+                </div>
+            {% else %}
+                <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-2">
+                        <div class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Detalles del Préstamo</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div><span class="text-zinc-400 text-xs block">Estudiante:</span> <b class="text-white">{{ prestamo.estudiante }}</b></div>
+                            <div><span class="text-zinc-400 text-xs block">Sección:</span> <b class="text-white">{{ prestamo.grupo }}</b></div>
+                            <div><span class="text-zinc-400 text-xs block">Equipo:</span> <b class="text-red-500 font-mono">{{ prestamo.inventario }}</b></div>
+                        </div>
+                    </div>
+
+                    <form action="{{ url_for('vista_estudiante') }}" method="POST" class="space-y-4 pt-2">
+                        <input type="hidden" name="inventario" value="{{ prestamo.inventario }}">
+
+                        <!-- CAMPO DE SEGURIDAD NUEVO: Cédula -->
+                        <div>
+                            <label class="text-xs font-semibold text-zinc-300 block mb-1">Confirma tu Número de Cédula</label>
+                            <input type="text" name="cedula" placeholder="Digite su cédula sin espacios ni guiones" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm font-mono outline-none transition">
+                            <p class="text-[10px] text-zinc-500 mt-1">Por seguridad, debe coincidir con la cédula registrada por el docente.</p>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-zinc-300 block mb-2">¿Recibiste el cargador correspondiente?</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+                                    <input type="radio" name="cargador_recibido" value="Sí" checked class="accent-red-600"> Sí, en buen estado
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+                                    <input type="radio" name="cargador_recibido" value="No" class="accent-red-600"> No lo recibí / Faltante
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-zinc-300">Observaciones / Reporte de Daños (Opcional)</label>
+                            <textarea name="reporte" rows="2" maxlength="300" placeholder="Describe si el equipo tiene algún detalle físico, daño o falla..." class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white text-sm outline-none transition mt-1"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-950/50 transition">
+                            Confirmar Recepción de Equipo
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="bg-zinc-950 border border-red-900/50 rounded-2xl p-6 text-center text-zinc-400 text-sm">
+                ⚠️ No se encontró ningún préstamo activo con el número de inventario <b class="font-mono text-red-400">3982-{{ inv_query.replace('3982-', '') }}</b>.
+            </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}
