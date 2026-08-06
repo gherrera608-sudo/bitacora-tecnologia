@@ -6,248 +6,366 @@
     <title>SPET - Reporte General de Préstamos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos específicos para cuando el documento se envía a impresión o PDF */
+        /* ========== ESTILOS ESTRICTOS Y EXACTOS PARA IMPRESIÓN ========== */
         @media print {
+            @page { margin: 1cm; }
             body {
-                background-color: #ffffff !important;
-                color: #111827 !important;
+                background: white !important;
+                color: black !important;
+                font-family: Arial, sans-serif !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
-            .print-hidden {
-                display: none !important;
-            }
+            .screen-only { display: none !important; }
+            .print-only { display: block !important; }
+            
+            .print-container { width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            
+            /* Membrete Oficial */
             .print-header {
-                display: block !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                border-bottom: 2px solid #cc0000 !important;
+                padding-bottom: 12px !important;
+                margin-bottom: 20px !important;
             }
-            .print-card {
-                background-color: #ffffff !important;
-                border: none !important;
-                box-shadow: none !important;
-                padding: 0 !important;
+            .print-header-left { display: flex !important; align-items: center !important; gap: 12px !important; }
+            .print-logo { width: 50px !important; height: 50px !important; object-fit: contain !important; }
+            .print-school-name { font-size: 13pt !important; font-weight: 900 !important; margin: 0 !important; color: #000 !important; }
+            .print-system-name { font-size: 9pt !important; margin: 0 !important; color: #333 !important; }
+            
+            .print-header-right { text-align: right !important; }
+            .print-informe { color: #cc0000 !important; font-size: 8pt !important; font-weight: bold !important; text-transform: uppercase !important; margin: 0 0 4px 0 !important; letter-spacing: 0.5px !important; }
+            .print-date { color: #555 !important; font-size: 7.5pt !important; margin: 0 !important; }
+            
+            /* Título del Cuerpo */
+            .print-body-title { font-size: 16pt !important; font-weight: 900 !important; color: #000 !important; margin: 4px 0 !important; }
+            .print-body-subtitle { font-size: 8.5pt !important; color: #555 !important; margin: 0 0 20px 0 !important; }
+            
+            /* Configuración de Tabla Exacta */
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th {
+                font-size: 7.5pt !important;
+                font-weight: 800 !important;
+                color: #222 !important;
+                text-align: left !important;
+                padding: 0 4px 10px 4px !important;
+                border-bottom: 1px solid #ccc !important;
+                vertical-align: bottom !important;
             }
-            table th {
-                color: #1f2937 !important;
-                background-color: #f3f4f6 !important;
-                border-bottom: 2px solid #990000 !important;
+            td {
+                font-size: 8pt !important;
+                padding: 12px 4px !important;
+                border-bottom: 1px solid #eee !important;
+                vertical-align: top !important;
+                color: #111 !important;
             }
-            table td {
-                color: #1f2937 !important;
-                border-bottom: 1px solid #e5e7eb !important;
+            
+            /* Anchos de columna para forzar los saltos de línea exactos de la imagen */
+            .w-col-1 { width: 9%; }
+            .w-col-2 { width: 16%; }
+            .w-col-3 { width: 11%; }
+            .w-col-4 { width: 16%; }
+            .w-col-5 { width: 14%; }
+            .w-col-6 { width: 16%; }
+            .w-col-7 { width: 18%; }
+            
+            /* Textos y Etiquetas */
+            .print-bold { font-weight: bold !important; }
+            .print-red { color: #cc0000 !important; }
+            .print-gray { color: #555 !important; }
+            .print-italic { font-style: italic !important; }
+            
+            .print-box-red {
+                border: 1px solid #cc0000 !important;
+                color: #cc0000 !important;
+                padding: 3px 6px !important;
+                border-radius: 4px !important;
+                font-size: 7pt !important;
+                font-weight: bold !important;
+                display: inline-block !important;
+                margin-top: 6px !important;
+                text-align: center !important;
+                max-width: 85px !important; /* Fuerza salto ej: Tecnología \n Informática */
+            }
+            
+            .print-pill-green {
+                border: 1px solid #10b981 !important;
+                color: #047857 !important;
+                padding: 3px 8px !important;
+                border-radius: 20px !important;
+                font-size: 7.5pt !important;
+                font-weight: bold !important;
+                display: inline-block !important;
+            }
+            
+            .print-pill-orange {
+                border: 1px solid #f59e0b !important;
+                color: #b45309 !important;
+                padding: 3px 8px !important;
+                border-radius: 20px !important;
+                font-size: 7.5pt !important;
+                font-weight: bold !important;
+                display: inline-block !important;
             }
         }
+        .print-only { display: none; }
     </style>
 </head>
 <body class="bg-[#121212] min-h-screen text-gray-100 font-sans antialiased pb-12">
 
-    <!-- Navbar Superior Institucional (Visible en pantalla, oculto al imprimir) -->
-    <header class="bg-black text-white border-b border-neutral-800 px-6 py-3 mb-8 shadow-md print-hidden">
-        <div class="max-w-[1400px] mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-neutral-900 border border-neutral-700 rounded flex items-center justify-center p-1">
-                    <img src="{{ url_for('static', filename='escudo.png') }}" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/40'">
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-red-600 font-black tracking-wider text-base">SPET</span>
-                        <span class="text-neutral-500">|</span>
-                        <h1 class="text-sm font-semibold text-neutral-200">Liceo Monseñor Ruben Odio Herrera</h1>
+    <!-- ======================================================= -->
+    <!-- 1. VISTA DE PANTALLA (MODO OSCURO - OCULTO AL IMPRIMIR) -->
+    <!-- ======================================================= -->
+    <div class="screen-only">
+        <!-- Navbar Superior -->
+        <header class="bg-black text-white border-b border-neutral-800 px-6 py-3 mb-8 shadow-md">
+            <div class="max-w-[1400px] mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-neutral-900 border border-neutral-700 rounded flex items-center justify-center p-1">
+                        <img src="{{ url_for('static', filename='escudo.png') }}" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/40'">
                     </div>
-                    <p class="text-[11px] text-neutral-400">Sistema de Préstamo de Equipo Tecnológico</p>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-red-600 font-black tracking-wider text-base">SPET</span>
+                            <span class="text-neutral-500">|</span>
+                            <h1 class="text-sm font-semibold text-neutral-200">Liceo Monseñor Rubén Odio Herrera</h1>
+                        </div>
+                        <p class="text-[11px] text-neutral-400">Sistema de Préstamo de Equipo Tecnológico</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <!-- Membrete Oficial Exclusivo para Impresión (Oculto en pantalla, visible al imprimir) -->
-    <div class="hidden print-header max-w-[1400px] mx-auto px-4 mb-6">
-        <div class="flex justify-between items-center border-b-2 border-red-800 pb-4 mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 flex items-center justify-center">
-                    <img src="{{ url_for('static', filename='escudo.png') }}" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/48'">
+        <main class="max-w-[1400px] mx-auto px-4 space-y-6">
+            <!-- Panel de Control y Filtros -->
+            <section class="bg-[#1a1a1a] rounded-2xl p-6 shadow-2xl border border-neutral-800">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="w-1 h-3.5 bg-red-600 rounded-full"></div>
+                            <span class="text-[10px] font-bold text-red-500 uppercase tracking-wider">INFORME OFICIAL</span>
+                        </div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">Reporte General de Préstamos de Equipo</h2>
+                        <p class="text-xs font-medium text-neutral-400">Panel de Control y Monitoreo Institucional — Dirección</p>
+                    </div>
+
+                    <!-- Botones y Métricas -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button onclick="window.print()" class="bg-[#262626] hover:bg-neutral-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-neutral-700 shadow-sm">
+                            🖨️ Imprimir
+                        </button>
+                        <a href="{{ url_for('descargar_reporte', asignatura=asignatura_filtro, grupo=grupo_filtro, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" class="bg-[#007a4d] hover:bg-[#00633e] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                            📊 Exportar a Excel
+                        </a>
+
+                        <div class="flex items-center gap-2 ml-2">
+                            <div class="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
+                                <span class="block text-[9px] font-bold text-neutral-400 tracking-wider">TOTAL</span>
+                                <span class="text-base font-black text-white">{{ total }}</span>
+                            </div>
+                            <div class="bg-emerald-950/40 border border-emerald-900/50 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
+                                <span class="block text-[9px] font-bold text-emerald-400 tracking-wider">RECIBIDOS</span>
+                                <span class="text-base font-black text-emerald-300">{{ confirmados }}</span>
+                            </div>
+                            <div class="bg-red-950/40 border border-red-900/50 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
+                                <span class="block text-[9px] font-bold text-red-400 tracking-wider">NOVEDADES</span>
+                                <span class="text-base font-black text-red-300">{{ novedades }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-base font-black tracking-wide text-gray-900">LICEO MONSEÑOR RUBÉN ODIO HERRERA</h1>
-                    <p class="text-xs text-gray-700 font-semibold">Sistema de Préstamo de Equipo Tecnológico (SPET)</p>
-                    <p class="text-[11px] text-gray-500">Dirección y Coordinación Técnica</p>
+
+                <hr class="border-neutral-800 my-4">
+
+                <!-- Formulario de Filtros -->
+                <form method="GET" action="{{ url_for('vista_direccion') }}" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div class="md:col-span-3">
+                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Especialidad / Asignatura</label>
+                        <select name="asignatura" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                            <option value="">Todas las asignaturas</option>
+                            {% for a in todas_asignaturas %}<option value="{{ a }}" {% if asignatura_filtro == a %}selected{% endif %}>{{ a }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Sección</label>
+                        <select name="grupo" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                            <option value="">Todas las secciones</option>
+                            {% for g in todos_grupos %}<option value="{{ g }}" {% if grupo_filtro == g %}selected{% endif %}>{{ g }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Desde</label>
+                        <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[11px] font-bold text-neutral-300 mb-1">Hasta</label>
+                        <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
+                    </div>
+                    <div class="md:col-span-3 flex items-center gap-2">
+                        <button type="submit" class="flex-1 bg-[#be121c] hover:bg-[#a10e16] text-white font-bold py-2 px-4 rounded-lg text-xs transition shadow-sm">Aplicar Filtros</button>
+                        <a href="{{ url_for('vista_direccion') }}" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 p-2 rounded-lg transition" title="Limpiar Filtros">🔄</a>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Tabla de Registros Oscura -->
+            <section class="bg-[#1a1a1a] rounded-2xl shadow-2xl border border-neutral-800 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-neutral-800 text-[10px] font-black text-neutral-400 tracking-wider uppercase bg-neutral-900/60">
+                                <th class="py-3.5 px-4">FECHA / HORA</th>
+                                <th class="py-3.5 px-4">DOCENTE / ESPECIALIDAD</th>
+                                <th class="py-3.5 px-4">N° INVENTARIO</th>
+                                <th class="py-3.5 px-4">ESTUDIANTE / CÉDULA</th>
+                                <th class="py-3.5 px-4">EQUIPO</th>
+                                <th class="py-3.5 px-4 text-center">ESTADO ESTUDIANTE</th>
+                                <th class="py-3.5 px-4">OBSERVACIONES / REPORTE</th>
+                                <th class="py-3.5 px-4 text-center">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-800/60 text-xs">
+                            {% for p in prestamos %}
+                            <tr class="hover:bg-neutral-900/40 transition">
+                                <td class="py-3.5 px-4 font-medium text-neutral-300 whitespace-nowrap">{{ p.fecha_entrega|strftime('%d/%m/%Y') }}<br><span class="text-[11px] text-neutral-500">{{ p.fecha_entrega|strftime('%H:%M') }}</span></td>
+                                <td class="py-3.5 px-4">
+                                    <span class="font-bold text-white block">{{ p.profesor }}</span>
+                                    <span class="inline-block bg-neutral-900 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-neutral-800 mt-0.5">{{ p.asignatura }}</span>
+                                </td>
+                                <td class="py-3.5 px-4 font-black text-red-500 tracking-tight whitespace-nowrap">{{ p.inventario }}</td>
+                                <td class="py-3.5 px-4">
+                                    <span class="font-bold text-white block">{{ p.estudiante }}</span>
+                                    <div class="text-[11px] text-neutral-400 flex items-center gap-1.5 mt-0.5"><span>Cédula: {{ p.cedula }}</span><span class="inline-block bg-neutral-900 text-neutral-300 font-bold px-1.5 py-0.2 rounded text-[10px] border border-neutral-800">Sección: {{ p.grupo }}</span></div>
+                                </td>
+                                <td class="py-3.5 px-4"><span class="font-semibold text-neutral-200 block">{{ p.marca_modelo }}</span><span class="text-[11px] text-neutral-400">Cargador: <strong class="text-neutral-200">{{ p.cargador_entregado }}</strong> | Caja: <strong class="text-neutral-200">{{ p.caja_entregada }}</strong></span></td>
+                                <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                    {% if p.confirmado_estudiante %}
+                                        <span class="inline-flex items-center gap-1 bg-emerald-950/60 text-emerald-300 font-bold text-[11px] px-3 py-1 rounded-full border border-emerald-800">✓ Confirmado</span>
+                                        {% if p.fecha_reporte %}<span class="block text-[10px] text-neutral-500 mt-1">{{ p.fecha_reporte|strftime('%d/%m/%Y %H:%M') }}</span>{% endif %}
+                                    {% else %}
+                                        <span class="inline-block bg-amber-950/60 text-amber-300 font-bold text-[11px] px-3 py-1 rounded-full border border-amber-800">En Espera</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3.5 px-4 text-neutral-400 italic">{{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}</td>
+                                <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg border border-neutral-700 transition" title="Editar">✏️</a>
+                                        <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este registro?')"><button type="submit" class="p-1.5 text-neutral-300 hover:text-red-400 hover:bg-red-950/50 rounded-lg border border-neutral-700 transition" title="Eliminar">🗑️</button></form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div class="text-right">
-                <span class="text-xs font-bold text-red-700 tracking-wider block">INFORME OFICIAL</span>
-                <span class="text-[11px] text-gray-500">Emitido: {{ ahora.strftime('%d/%m/%Y %H:%M') if ahora else '' }}</span>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Contenedor Principal -->
-    <main class="max-w-[1400px] mx-auto px-4 space-y-6">
-
-        <!-- Panel de Control y Filtros (Oculto al imprimir) -->
-        <section class="bg-[#1a1a1a] rounded-2xl p-6 shadow-2xl border border-neutral-800 print-hidden">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
+    <!-- ======================================================= -->
+    <!-- 2. VISTA EXCLUSIVA DE IMPRESIÓN (IDÉNTICA A LA IMAGEN)  -->
+    <!-- ======================================================= -->
+    <div class="print-only print-container">
+        
+        <!-- Membrete -->
+        <div class="print-header">
+            <div class="print-header-left">
+                <img src="{{ url_for('static', filename='escudo.png') }}" class="print-logo">
                 <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="w-1 h-3.5 bg-red-600 rounded-full"></div>
-                        <span class="text-[10px] font-bold text-red-500 uppercase tracking-wider">
-                            INFORME OFICIAL
-                        </span>
-                    </div>
-                    <h2 class="text-2xl font-black text-white tracking-tight">Reporte General de Préstamos de Equipo</h2>
-                    <p class="text-xs font-medium text-neutral-400">Panel de Control y Monitoreo Institucional — Dirección</p>
-                </div>
-
-                <!-- Acciones Rápidas y Métricas -->
-                <div class="flex flex-wrap items-center gap-3">
-                    <a href="javascript:window.print()" class="bg-[#262626] hover:bg-neutral-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-neutral-700 shadow-sm">
-                        🖨️ Imprimir
-                    </a>
-                    <a href="{{ url_for('descargar_reporte', asignatura=asignatura_filtro, grupo=grupo_filtro, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" class="bg-[#007a4d] hover:bg-[#00633e] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                        📊 Exportar a Excel
-                    </a>
-
-                    <!-- Indicadores (KPIs) -->
-                    <div class="flex items-center gap-2 ml-2">
-                        <div class="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
-                            <span class="block text-[9px] font-bold text-neutral-400 tracking-wider">TOTAL</span>
-                            <span class="text-base font-black text-white">{{ total }}</span>
-                        </div>
-                        <div class="bg-emerald-950/40 border border-emerald-900/50 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
-                            <span class="block text-[9px] font-bold text-emerald-400 tracking-wider">RECIBIDOS</span>
-                            <span class="text-base font-black text-emerald-300">{{ confirmados }}</span>
-                        </div>
-                        <div class="bg-red-950/40 border border-red-900/50 rounded-xl px-4 py-1.5 text-center min-w-[70px]">
-                            <span class="block text-[9px] font-bold text-red-400 tracking-wider">NOVEDADES</span>
-                            <span class="text-base font-black text-red-300">{{ novedades }}</span>
-                        </div>
-                    </div>
+                    <!-- El texto erróneo fue eliminado permanentemente de aquí -->
+                    <h1 class="print-school-name">LICEO MONSEÑOR RUBÉN ODIO HERRERA</h1>
+                    <p class="print-system-name">Sistema de Préstamo de Equipo Tecnológico (SPET)</p>
                 </div>
             </div>
+            <div class="print-header-right">
+                <p class="print-informe">INFORME OFICIAL</p>
+                <p class="print-date">Emitido: {{ ahora.strftime('%d/%m/%Y %H:%M') if ahora else '' }}</p>
+            </div>
+        </div>
 
-            <hr class="border-neutral-800 my-4">
+        <!-- Título -->
+        <div style="margin-bottom: 25px;">
+            <p class="print-informe">INFORME OFICIAL</p>
+            <h2 class="print-body-title">Reporte General de Préstamos de Equipo</h2>
+            <p class="print-body-subtitle">Panel de Control y Monitoreo Institucional — Dirección</p>
+        </div>
 
-            <!-- Formulario de Filtros -->
-            <form method="GET" action="{{ url_for('vista_direccion') }}" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-                <div class="md:col-span-3">
-                    <label class="block text-[11px] font-bold text-neutral-300 mb-1">Especialidad / Asignatura</label>
-                    <select name="asignatura" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
-                        <option value="">Todas las asignaturas</option>
-                        {% for a in todas_asignaturas %}
-                            <option value="{{ a }}" {% if asignatura_filtro == a %}selected{% endif %}>{{ a }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-[11px] font-bold text-neutral-300 mb-1">Sección</label>
-                    <select name="grupo" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
-                        <option value="">Todas las secciones</option>
-                        {% for g in todos_grupos %}
-                            <option value="{{ g }}" {% if grupo_filtro == g %}selected{% endif %}>{{ g }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-[11px] font-bold text-neutral-300 mb-1">Desde</label>
-                    <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-[11px] font-bold text-neutral-300 mb-1">Hasta</label>
-                    <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition outline-none">
-                </div>
-
-                <div class="md:col-span-3 flex items-center gap-2">
-                    <button type="submit" class="flex-1 bg-[#be121c] hover:bg-[#a10e16] text-white font-bold py-2 px-4 rounded-lg text-xs transition shadow-sm">
-                        Aplicar Filtros
-                    </button>
-                    <a href="{{ url_for('vista_direccion') }}" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 p-2 rounded-lg transition" title="Limpiar Filtros">
-                        🔄
-                    </a>
-                </div>
-            </form>
-        </section>
-
-        <!-- Tabla de Registros -->
-        <section class="bg-[#1a1a1a] rounded-2xl shadow-2xl border border-neutral-800 overflow-hidden print-card">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-neutral-800 text-[10px] font-black text-neutral-400 tracking-wider uppercase bg-neutral-900/60">
-                            <th class="py-3.5 px-4">FECHA / HORA</th>
-                            <th class="py-3.5 px-4">DOCENTE / ESPECIALIDAD</th>
-                            <th class="py-3.5 px-4">N° INVENTARIO</th>
-                            <th class="py-3.5 px-4">ESTUDIANTE / CÉDULA</th>
-                            <th class="py-3.5 px-4">EQUIPO</th>
-                            <th class="py-3.5 px-4">ESTADO ESTUDIANTE</th>
-                            <th class="py-3.5 px-4">OBSERVACIONES / REPORTE</th>
-                            <th class="py-3.5 px-4 text-center print-hidden">ACCIONES</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-800/60 text-xs">
-                        {% for p in prestamos %}
-                        <tr class="hover:bg-neutral-900/40 transition">
-                            <td class="py-3.5 px-4 font-medium text-neutral-300 whitespace-nowrap">
-                                {{ p.fecha_entrega|strftime('%d/%m/%Y') }}<br>
-                                <span class="text-[11px] text-neutral-500">{{ p.fecha_entrega|strftime('%H:%M') }}</span>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <span class="font-bold text-white block">{{ p.profesor }}</span>
-                                <span class="inline-block bg-neutral-900 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-neutral-800 mt-0.5">
-                                    {{ p.asignatura }}
-                                </span>
-                            </td>
-                            <td class="py-3.5 px-4 font-black text-red-500 tracking-tight whitespace-nowrap">
-                                {{ p.inventario }}
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <span class="font-bold text-white block">{{ p.estudiante }}</span>
-                                <div class="text-[11px] text-neutral-400 flex flex-col mt-0.5">
-                                    <span>Cédula: {{ p.cedula }}</span>
-                                    <span class="font-semibold text-neutral-300">Sección: {{ p.grupo }}</span>
-                                </div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <span class="font-semibold text-neutral-200 block">{{ p.marca_modelo }}</span>
-                                <span class="text-[11px] text-neutral-400">
-                                    Cargador: {{ p.cargador_entregado }} | Caja: {{ p.caja_entregada }}
-                                </span>
-                            </td>
-                            <td class="py-3.5 px-4 whitespace-nowrap">
-                                {% if p.confirmado_estudiante %}
-                                    <span class="inline-flex items-center gap-1 bg-emerald-950/60 text-emerald-300 font-bold text-[11px] px-3 py-1 rounded-full border border-emerald-800">
-                                        ✓ Confirmado
-                                    </span>
-                                    {% if p.fecha_reporte %}
-                                        <span class="block text-[10px] text-neutral-500 mt-1">{{ p.fecha_reporte|strftime('%d/%m/%Y %H:%M') }}</span>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="inline-block bg-amber-950/60 text-amber-300 font-bold text-[11px] px-3 py-1 rounded-full border border-amber-800">
-                                        En Espera
-                                    </span>
+        <!-- Tabla Clásica -->
+        <table>
+            <thead>
+                <tr>
+                    <th class="w-col-1">FECHA / HORA</th>
+                    <th class="w-col-2">DOCENTE /<br>ESPECIALIDAD</th>
+                    <th class="w-col-3">N°<br>INVENTARIO</th>
+                    <th class="w-col-4">ESTUDIANTE /<br>CÉDULA</th>
+                    <th class="w-col-5">EQUIPO</th>
+                    <th class="w-col-6">ESTADO<br>ESTUDIANTE</th>
+                    <th class="w-col-7">OBSERVACIONES /<br>REPORTE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in prestamos %}
+                <tr>
+                    <!-- 1. Fecha / Hora -->
+                    <td>
+                        {{ p.fecha_entrega|strftime('%d/%m/%Y') }}<br>
+                        {{ p.fecha_entrega|strftime('%H:%M') }}
+                    </td>
+                    
+                    <!-- 2. Docente / Especialidad -->
+                    <td>
+                        <div class="print-bold" style="max-width: 100px; word-wrap: break-word;">{{ p.profesor }}</div>
+                        <div class="print-box-red">{{ p.asignatura }}</div>
+                    </td>
+                    
+                    <!-- 3. N° Inventario -->
+                    <td>
+                        <span class="print-bold print-red">{{ p.inventario }}</span>
+                    </td>
+                    
+                    <!-- 4. Estudiante / Cédula -->
+                    <td>
+                        <div class="print-bold" style="max-width: 110px; word-wrap: break-word;">{{ p.estudiante }}</div>
+                        <div class="print-gray" style="font-size: 7.5pt; margin-top: 4px;">Cédula:</div>
+                        <div class="print-gray" style="font-size: 7.5pt;">{{ p.cedula }}</div>
+                        <div class="print-bold" style="font-size: 7.5pt; margin-top: 4px;">Sección: {{ p.grupo }}</div>
+                    </td>
+                    
+                    <!-- 5. Equipo -->
+                    <td>
+                        <div class="print-bold" style="max-width: 100px; word-wrap: break-word;">{{ p.marca_modelo }}</div>
+                        <div class="print-gray" style="font-size: 7.5pt; margin-top: 4px;">
+                            Cargador: {{ p.cargador_entregado }} |<br>Caja: {{ p.caja_entregada }}
+                        </div>
+                    </td>
+                    
+                    <!-- 6. Estado Estudiante -->
+                    <td>
+                        {% if p.confirmado_estudiante %}
+                            <div>
+                                <span class="print-pill-green">✓ Confirmado</span>
+                                {% if p.fecha_reporte %}
+                                    <div class="print-gray" style="font-size: 7pt; margin-top: 4px; padding-left: 2px;">
+                                        {{ p.fecha_reporte|strftime('%d/%m/%Y %H:%M') }}
+                                    </div>
                                 {% endif %}
-                            </td>
-                            <td class="py-3.5 px-4 text-neutral-400 italic">
-                                {{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}
-                            </td>
-                            <td class="py-3.5 px-4 text-center whitespace-nowrap print-hidden">
-                                <div class="flex items-center justify-center gap-1.5">
-                                    <a href="{{ url_for('editar_prestamo', id=p.id) }}" class="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg border border-neutral-700 transition" title="Editar">
-                                        ✏️
-                                    </a>
-                                    <form action="{{ url_for('eliminar_prestamo', id=p.id) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este registro?')">
-                                        <button type="submit" class="p-1.5 text-neutral-300 hover:text-red-400 hover:bg-red-950/50 rounded-lg border border-neutral-700 transition" title="Eliminar">
-                                            🗑️
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
+                            </div>
+                        {% else %}
+                            <span class="print-pill-orange">En Espera</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- 7. Observaciones -->
+                    <td>
+                        <span class="print-italic print-gray">{{ p.reporte_estudiante if p.reporte_estudiante else 'Sin novedades' }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 </body>
 </html>
