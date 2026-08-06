@@ -126,22 +126,33 @@ def descargar_reporte():
 @app.route('/profesor', methods=['GET', 'POST'])
 def vista_profesor():
     if request.method == 'POST':
+        # --- VALIDACIÓN DE BACKEND CONTRA ERRORES 500 ---
+        inventario_raw = request.form.get('inventario', '').strip()
+        marca_modelo = request.form.get('marca_modelo', '').strip()
+        cedula = limpiar_cedula(request.form.get('cedula', ''))
+        estudiante = request.form.get('estudiante', '').strip()
+        grupo = request.form.get('grupo', '').strip()
+        
+        if not inventario_raw or not marca_modelo or not cedula or not estudiante or not grupo:
+            flash("Error: Todos los campos obligatorios deben estar completos.", "danger")
+            return redirect(url_for('vista_profesor'))
+
         nuevo_prestamo = Prestamo(
-            inventario=formatear_inventario(request.form.get('inventario', '')),
-            marca_modelo=request.form['marca_modelo'][:100],
-            cedula=limpiar_cedula(request.form.get('cedula', '')),
-            estudiante=request.form['estudiante'][:100],
-            grupo=request.form['grupo'],
-            profesor=request.form['profesor'][:100],
-            asignatura=request.form['asignatura'],
+            inventario=formatear_inventario(inventario_raw),
+            marca_modelo=marca_modelo[:100],
+            cedula=cedula,
+            estudiante=estudiante[:100],
+            grupo=grupo,
+            profesor=request.form.get('profesor', 'Docente')[:100],
+            asignatura=request.form.get('asignatura', 'General'),
             cargador_entregado=request.form.get('cargador', 'No'),
             caja_entregada=request.form.get('caja', 'No'),
-            estado_inicial=request.form['estado_inicial'][:200],
+            estado_inicial=request.form.get('estado_inicial', 'Excelente estado')[:200],
             fecha_entrega=hora_cr()
         )
         db.session.add(nuevo_prestamo)
         db.session.commit()
-        flash("¡Registrado!", "success")
+        flash("¡Préstamo registrado exitosamente!", "success")
         return redirect(url_for('vista_profesor'))
     return render_template('profesor.html')
 
@@ -149,16 +160,26 @@ def vista_profesor():
 def editar_prestamo(id):
     prestamo = Prestamo.query.get_or_404(id)
     if request.method == 'POST':
-        prestamo.inventario = formatear_inventario(request.form.get('inventario', ''))
-        prestamo.grupo = request.form['grupo']
+        inv_edit = request.form.get('inventario', '').strip()
+        grupo_edit = request.form.get('grupo', '').strip()
+        
+        if not inv_edit or not grupo_edit:
+            flash("Error: El inventario y la sección no pueden quedar vacíos.", "danger")
+            return redirect(url_for('editar_prestamo', id=id))
+            
+        prestamo.inventario = formatear_inventario(inv_edit)
+        prestamo.grupo = grupo_edit
         db.session.commit()
+        flash("¡Registro actualizado correctamente!", "success")
         return redirect(url_for('vista_direccion'))
     return render_template('editar.html', prestamo=prestamo)
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
 def eliminar_prestamo(id):
-    db.session.delete(Prestamo.query.get_or_404(id))
+    prestamo = Prestamo.query.get_or_404(id)
+    db.session.delete(prestamo)
     db.session.commit()
+    flash("Registro eliminado correctamente.", "success")
     return redirect(request.referrer or url_for('vista_direccion'))
 
 @app.route('/estudiante', methods=['GET', 'POST'])
@@ -172,8 +193,10 @@ def vista_estudiante():
         inv_final = formatear_inventario(inv_post)
         cedula_ingresada = limpiar_cedula(request.form.get('cedula', ''))
         
-        # VALIDACIÓN DE SEGURIDAD PARA EQUIPOS COMPARTIDOS
-        # Buscamos SOLO el préstamo NO confirmado (False) que coincida con este inventario Y esta cédula
+        if not inv_post or not cedula_ingresada:
+            flash("Por favor ingrese el número de inventario y su cédula.", "danger")
+            return redirect(url_for('vista_estudiante'))
+
         prestamo = Prestamo.query.filter_by(
             inventario=inv_final, 
             cedula=cedula_ingresada, 
@@ -196,7 +219,6 @@ def vista_estudiante():
         
     prestamo_actual = None
     if inv_query:
-        # Buscamos el préstamo más reciente que aún no esté confirmado
         prestamo_actual = Prestamo.query.filter_by(
             inventario=inv_query, 
             confirmado_estudiante=False
