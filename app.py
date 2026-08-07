@@ -82,7 +82,6 @@ def vista_direccion():
         try: query = query.filter(Prestamo.fecha_entrega <= datetime.strptime(fecha_fin + ' 23:59:59', '%Y-%m-%d %H:%M:%S'))
         except: pass
             
-    # PASO 2: Paginación aplicada correctamente (50 registros por página)
     pagination = query.order_by(Prestamo.id.desc()).paginate(page=page, per_page=50, error_out=False)
     prestamos = pagination.items
     
@@ -158,7 +157,10 @@ def vista_profesor():
         db.session.commit()
         flash("¡Préstamo registrado exitosamente!", "success")
         return redirect(url_for('vista_profesor'))
-    return render_template('profesor.html')
+        
+    # Enviamos los últimos 15 registros para que el profesor pueda revisarlos, editarlos o borrarlos si se equivocó
+    ultimos_prestamos = Prestamo.query.order_by(Prestamo.id.desc()).limit(15).all()
+    return render_template('profesor.html', prestamos=ultimos_prestamos)
 
 @app.route('/editar/<int:id>', methods=['GET', 'POST'])
 def editar_prestamo(id):
@@ -185,7 +187,7 @@ def editar_prestamo(id):
             
         db.session.commit()
         flash("¡Registro actualizado correctamente!", "success")
-        return redirect(url_for('vista_direccion'))
+        return redirect(request.referrer or url_for('vista_direccion'))
         
     return render_template('editar.html', prestamo=prestamo)
 
