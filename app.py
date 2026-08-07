@@ -126,7 +126,6 @@ def descargar_reporte():
 @app.route('/profesor', methods=['GET', 'POST'])
 def vista_profesor():
     if request.method == 'POST':
-        # --- VALIDACIÓN DE BACKEND CONTRA ERRORES 500 ---
         inventario_raw = request.form.get('inventario', '').strip()
         marca_modelo = request.form.get('marca_modelo', '').strip()
         cedula = limpiar_cedula(request.form.get('cedula', ''))
@@ -161,17 +160,28 @@ def editar_prestamo(id):
     prestamo = Prestamo.query.get_or_404(id)
     if request.method == 'POST':
         inv_edit = request.form.get('inventario', '').strip()
+        marca_edit = request.form.get('marca_modelo', '').strip()
+        cedula_edit = limpiar_cedula(request.form.get('cedula', ''))
+        estudiante_edit = request.form.get('estudiante', '').strip()
         grupo_edit = request.form.get('grupo', '').strip()
+        asignatura_edit = request.form.get('asignatura', '').strip()
         
-        if not inv_edit or not grupo_edit:
-            flash("Error: El inventario y la sección no pueden quedar vacíos.", "danger")
+        if not inv_edit or not marca_edit or not cedula_edit or not estudiante_edit or not grupo_edit:
+            flash("Error: Todos los campos obligatorios deben estar completos.", "danger")
             return redirect(url_for('editar_prestamo', id=id))
             
         prestamo.inventario = formatear_inventario(inv_edit)
+        prestamo.marca_modelo = marca_edit[:100]
+        prestamo.cedula = cedula_edit
+        prestamo.estudiante = estudiante_edit[:100]
         prestamo.grupo = grupo_edit
+        if asignatura_edit:
+            prestamo.asignatura = asignatura_edit
+            
         db.session.commit()
         flash("¡Registro actualizado correctamente!", "success")
         return redirect(url_for('vista_direccion'))
+        
     return render_template('editar.html', prestamo=prestamo)
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
@@ -225,6 +235,9 @@ def vista_estudiante():
         ).order_by(Prestamo.id.desc()).first()
         
     return render_template('estudiante.html', inv_query=inv_query_raw, prestamo=prestamo_actual)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
