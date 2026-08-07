@@ -1,72 +1,128 @@
 {% extends 'layout.html' %}
-{% block title %}Módulo Profesor - Registro{% endblock %}
+{% block title %}Registrar Entrega{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto p-4 space-y-8">
+<div class="max-w-4xl mx-auto space-y-6">
 
     <!-- Formulario de Registro -->
     <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl shadow-black/40">
         <div class="flex items-center gap-3 mb-6 pb-3 border-b border-zinc-800">
             <div class="w-2 h-6 bg-red-600 rounded-full"></div>
-            <h1 class="text-xl font-bold text-white tracking-wide">Registro de Préstamo de Equipo</h1>
+            <h1 class="text-xl font-bold text-white tracking-wide">Entrega de Equipo (Profesor)</h1>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="mb-4 p-3 rounded-xl text-xs font-bold {% if category == 'danger' %}bg-red-950/60 text-red-300 border border-red-800{% else %}bg-emerald-950/60 text-emerald-300 border border-emerald-800{% endif %}">
-                        {{ message }}
+                    <div class="mb-4 p-3 bg-red-950/80 border border-red-800 text-red-200 text-xs rounded-xl flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <form method="POST" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form action="{{ url_for('vista_profesor') }}" method="POST" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-xs font-semibold text-zinc-300 block mb-1">N° de Inventario</label>
-                    <input type="text" name="inventario" placeholder="Ej: 3982-XXXX" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm font-mono outline-none transition">
+                    <label class="text-xs font-semibold text-zinc-300">Nombre del Profesor</label>
+                    <input type="text" name="profesor" placeholder="Ej: Lic. Juan Pérez" maxlength="80" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
                 </div>
                 <div>
-                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Equipo (Marca y Modelo)</label>
-                    <input type="text" name="marca_modelo" placeholder="Ej: Laptop HP / Chromebook" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Cédula del Estudiante</label>
-                    <input type="text" name="cedula" placeholder="Sin espacios ni guiones" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm font-mono outline-none transition">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Nombre del Estudiante</label>
-                    <input type="text" name="estudiante" placeholder="Nombre completo" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
+                    <label class="text-xs font-semibold text-zinc-300">Asignatura / Especialidad</label>
+                    <select name="asignatura" class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
+                        <option value="Tecnología Informática">Tecnología Informática</option>
+                        <option value="Secretariado Ejecutivo">Secretariado Ejecutivo</option>
+                        <option value="Contabilidad">Contabilidad</option>
+                        <option value="Formación Tecnológica">Formación Tecnológica</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Sección / Grupo</label>
-                    <input type="text" name="grupo" placeholder="Ej: 10-1" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
+                    <div class="flex justify-between items-center mb-0.5">
+                        <label class="text-xs font-semibold text-zinc-300">N° Inventario</label>
+                        <span class="text-[10px] text-zinc-500">Últimos 4 dígitos</span>
+                    </div>
+                    <!-- DISEÑO CON PREFIJO 3982- FIJO -->
+                    <div class="flex items-center bg-zinc-900 border border-zinc-700 focus-within:border-red-500 rounded-xl px-3 py-2 transition">
+                        <span class="text-white font-mono font-bold text-base select-none pr-1">3982-</span>
+                        <input type="text" name="inventario" placeholder="0000" 
+                               pattern="[0-9]{4}" 
+                               maxlength="4" minlength="4"
+                               inputmode="numeric"
+                               title="Ingresa únicamente los últimos 4 dígitos del número de inventario."
+                               required class="w-full bg-transparent text-white font-mono font-bold text-base outline-none tracking-widest placeholder-zinc-600">
+                    </div>
                 </div>
                 <div>
-                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Docente</label>
-                    <input type="text" name="profesor" placeholder="Tu nombre" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Asignatura</label>
-                    <input type="text" name="asignatura" placeholder="Ej: Informática" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
+                    <label class="text-xs font-semibold text-zinc-300">Marca y Modelo</label>
+                    <input type="text" name="marca_modelo" placeholder="Ej: Dell Latitude" maxlength="80" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-950/50 transition mt-4">
-                Registrar Préstamo
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <div class="flex justify-between items-center mb-0.5">
+                        <label class="text-xs font-semibold text-zinc-300">N° Cédula / DIMEX</label>
+                        <span class="text-[10px] text-zinc-500">Solo números</span>
+                    </div>
+                    <input type="text" name="cedula" placeholder="Ej: 112340567" 
+                           pattern="[0-9]{8,12}" 
+                           minlength="8" maxlength="12" 
+                           inputmode="numeric"
+                           title="Por favor ingresa únicamente números (entre 8 y 12 dígitos, sin letras ni guiones)."
+                           required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white font-mono outline-none transition">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-zinc-300">Nombre Completo Estudiante</label>
+                    <input type="text" name="estudiante" placeholder="Nombre del estudiante" maxlength="80" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
+                </div>
+            </div>
+
+            <div>
+                <label class="text-xs font-semibold text-zinc-300">Sección / Grupo</label>
+                <select name="grupo" class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
+                    <optgroup label="Sétimo (7°)">
+                        <option value="7-1">7-1</option><option value="7-2">7-2</option><option value="7-3">7-3</option><option value="7-4">7-4</option><option value="7-5">7-5</option><option value="7-6">7-6</option><option value="7-7">7-7</option><option value="7-8">7-8</option><option value="7-9">7-9</option><option value="7-10">7-10</option><option value="7-11">7-11</option><option value="7-12">7-12</option><option value="7-13">7-13</option><option value="7-14">7-14</option>
+                    </optgroup>
+                    <optgroup label="Octavo (8°)">
+                        <option value="8-1">8-1</option><option value="8-2">8-2</option><option value="8-3">8-3</option><option value="8-4">8-4</option><option value="8-5">8-5</option><option value="8-6">8-6</option><option value="8-7">8-7</option><option value="8-8">8-8</option><option value="8-9">8-9</option><option value="8-10">8-10</option><option value="8-11">8-11</option><option value="8-12">8-12</option>
+                    </optgroup>
+                    <optgroup label="Noveno (9°)">
+                        <option value="9-1">9-1</option><option value="9-2">9-2</option><option value="9-3">9-3</option><option value="9-4">9-4</option><option value="9-5">9-5</option><option value="9-6">9-6</option><option value="9-7">9-7</option><option value="9-8">9-8</option><option value="9-9">9-9</option><option value="9-10">9-10</option><option value="9-11">9-11</option>
+                    </optgroup>
+                    <optgroup label="Décimo (10°)">
+                        <option value="10-1">10-1</option><option value="10-2">10-2</option><option value="10-3">10-3</option><option value="10-4">10-4</option><option value="10-5">10-5</option><option value="10-6">10-6</option><option value="10-7">10-7</option><option value="10-8">10-8</option><option value="10-9">10-9</option>
+                    </optgroup>
+                    <optgroup label="Undécimo (11°)">
+                        <option value="11-1">11-1</option><option value="11-2">11-2</option><option value="11-3">11-3</option><option value="11-4">11-4</option><option value="11-5">11-5</option><option value="11-6">11-6</option><option value="11-7">11-7</option><option value="11-8">11-8</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="flex gap-6 py-1">
+                <label class="text-sm text-zinc-300 flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="cargador" value="Sí" checked class="accent-red-600 w-4 h-4 rounded"> Incluye Cargador
+                </label>
+                <label class="text-sm text-zinc-300 flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="caja" value="Sí" checked class="accent-red-600 w-4 h-4 rounded"> Entregado en Caja
+                </label>
+            </div>
+
+            <div>
+                <label class="text-xs font-semibold text-zinc-300">Estado Físico Inicial</label>
+                <textarea name="estado_inicial" rows="2" maxlength="200" class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white text-sm outline-none transition">Excelente estado.</textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-950/50 transition duration-200 tracking-wide">
+                Guardar y Entregar
             </button>
         </form>
     </div>
 
     <!-- Sección de Últimos Registros Realizados (Para que el profesor pueda corregir o borrar si se equivocó) -->
     <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Últimos Registros Realizados (Corrección rápida)</h2>
+        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Últimos Registros Realizados (Corrección Rápida)</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
