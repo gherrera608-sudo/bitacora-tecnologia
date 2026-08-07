@@ -1,77 +1,77 @@
 {% extends 'layout.html' %}
-{% block title %}Editar Registro{% endblock %}
+{% block title %}Editar Préstamo{% endblock %}
 {% block content %}
-<div class="max-w-xl mx-auto bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl">
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-xl font-bold text-white">Editar Registro de Préstamo</h1>
-        <a href="{{ url_for('vista_direccion') }}" class="text-xs text-zinc-400 hover:text-white">Cancelar</a>
-    </div>
-    <form action="{{ url_for('editar_prestamo', id=prestamo.id) }}" method="POST" class="space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="text-xs font-semibold text-zinc-300">Nombre del Profesor</label>
-                <input type="text" name="profesor" value="{{ prestamo.profesor }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
+<div class="max-w-xl mx-auto space-y-6">
+
+    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl shadow-black/40">
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-zinc-800">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-6 bg-red-600 rounded-full"></div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Editar Registro de Préstamo</h1>
             </div>
-            <div>
-                <label class="text-xs font-semibold text-zinc-300">Asignatura / Especialidad</label>
-                <select name="asignatura" class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
-                    <option value="Tecnología Informática" {% if prestamo.asignatura == 'Tecnología Informática' %}selected{% endif %}>Tecnología Informática</option>
-                    <option value="Secretariado Ejecutivo" {% if prestamo.asignatura == 'Secretariado Ejecutivo' %}selected{% endif %}>Secretariado Ejecutivo</option>
-                    <option value="Contabilidad" {% if prestamo.asignatura == 'Contabilidad' %}selected{% endif %}>Contabilidad</option>
-                    <option value="Formación Tecnológica" {% if prestamo.asignatura == 'Formación Tecnológica' %}selected{% endif %}>Formación Tecnológica</option>
-                </select>
-            </div>
+            <a href="{{ url_for('vista_direccion') }}" class="text-xs text-zinc-400 hover:text-white transition">← Volver</a>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="text-xs font-semibold text-zinc-300">N° Inventario</label>
-                <input type="text" name="inventario" value="{{ prestamo.inventario }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white font-mono uppercase outline-none transition">
-            </div>
-            <div>
-                <label class="text-xs font-semibold text-zinc-300">Marca y Modelo</label>
-                <input type="text" name="marca_modelo" value="{{ prestamo.marca_modelo }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="text-xs font-semibold text-zinc-300">N° Cédula</label>
-                <input type="text" name="cedula" value="{{ prestamo.cedula }}" placeholder="Ej: 112340567" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white font-mono outline-none transition">
-            </div>
-            <div>
-                <label class="text-xs font-semibold text-zinc-300">Nombre Estudiante</label>
-                <input type="text" name="estudiante" value="{{ prestamo.estudiante }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
-            </div>
-        </div>
-
-        <div>
-            <label class="text-xs font-semibold text-zinc-300">Sección / Grupo</label>
-            <select name="grupo" class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white outline-none transition">
-                {% set secciones = [
-                    '7-1','7-2','7-3','7-4','7-5','7-6','7-7','7-8','7-9','7-10','7-11','7-12','7-13','7-14',
-                    '8-1','8-2','8-3','8-4','8-5','8-6','8-7','8-8','8-9','8-10','8-11','8-12',
-                    '9-1','9-2','9-3','9-4','9-5','9-6','9-7','9-8','9-9','9-10','9-11',
-                    '10-1','10-2','10-3','10-4','10-5','10-6','10-7','10-8','10-9',
-                    '11-1','11-2','11-3','11-4','11-5','11-6','11-7','11-8'
-                ] %}
-                {% for sec in secciones %}
-                    <option value="{{ sec }}" {% if prestamo.grupo == sec %}selected{% endif %}>{{ sec }}</option>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-3 rounded-xl text-xs font-bold bg-red-950/60 text-red-300 border border-red-800">
+                        {{ message }}
+                    </div>
                 {% endfor %}
-            </select>
-        </div>
+            {% endif %}
+        {% endwith %}
 
-        <div class="flex gap-4">
-            <label class="text-sm text-zinc-300"><input type="checkbox" name="cargador" value="Sí" {% if prestamo.cargador_entregado == 'Sí' %}checked{% endif %} class="accent-red-600"> Incluye Cargador</label>
-            <label class="text-sm text-zinc-300"><input type="checkbox" name="caja" value="Sí" {% if prestamo.caja_entregada == 'Sí' %}checked{% endif %} class="accent-red-600"> Entregado en Caja</label>
-        </div>
+        <form method="POST" class="space-y-4">
+            
+            <!-- Número de Inventario -->
+            <div>
+                <label class="text-xs font-semibold text-zinc-300 block mb-1">N° de Inventario</label>
+                <input type="text" name="inventario" value="{{ prestamo.inventario }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm font-mono outline-none transition">
+            </div>
 
-        <div>
-            <label class="text-xs font-semibold text-zinc-300">Estado Físico Inicial</label>
-            <textarea name="estado_inicial" rows="2" class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2 text-white text-sm outline-none transition">{{ prestamo.estado_inicial }}</textarea>
-        </div>
+            <!-- Estudiante -->
+            <div>
+                <label class="text-xs font-semibold text-zinc-300 block mb-1">Nombre del Estudiante</label>
+                <input type="text" name="estudiante" value="{{ prestamo.estudiante }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
+            </div>
 
-        <button type="submit" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl shadow-lg transition">Guardar Cambios</button>
-    </form>
+            <!-- Cédula -->
+            <div>
+                <label class="text-xs font-semibold text-zinc-300 block mb-1">Cédula del Estudiante</label>
+                <input type="text" name="cedula" value="{{ prestamo.cedula }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm font-mono outline-none transition">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Sección / Grupo -->
+                <div>
+                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Sección</label>
+                    <input type="text" name="grupo" value="{{ prestamo.grupo }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
+                </div>
+
+                <!-- Asignatura -->
+                <div>
+                    <label class="text-xs font-semibold text-zinc-300 block mb-1">Asignatura</label>
+                    <input type="text" name="asignatura" value="{{ prestamo.asignatura }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
+                </div>
+            </div>
+
+            <!-- Marca y Modelo del Equipo -->
+            <div>
+                <label class="text-xs font-semibold text-zinc-300 block mb-1">Equipo (Marca y Modelo)</label>
+                <input type="text" name="marca_modelo" value="{{ prestamo.marca_modelo }}" required class="w-full bg-zinc-900 border border-zinc-700 focus:border-red-500 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition">
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <a href="{{ url_for('vista_direccion') }}" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold py-3 rounded-xl text-center text-xs transition border border-zinc-700">
+                    Cancelar
+                </a>
+                <button type="submit" class="flex-1 bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-red-950/50">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+
 </div>
 {% endblock %}
