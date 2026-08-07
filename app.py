@@ -3,7 +3,7 @@ import re
 from io import BytesIO
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from flask import Flask, render_template, request, redirect, url_for, send_file, flash
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
 from flask_sqlalchemy import SQLAlchemy
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -135,10 +135,14 @@ def vista_profesor():
         cedula = limpiar_cedula(request.form.get('cedula', ''))
         estudiante = request.form.get('estudiante', '').strip()
         grupo = request.form.get('grupo', '').strip()
+        profesor_nombre = request.form.get('profesor', 'Docente').strip()
         
         if not inventario_raw or not marca_modelo or not cedula or not estudiante or not grupo:
             flash("Error: Todos los campos obligatorios deben estar completos.", "danger")
             return redirect(url_for('vista_profesor'))
+
+        # Guardamos el nombre del profesor en la sesión para filtrar sus propios registros
+        session['profesor_actual'] = profesor_nombre
 
         nuevo_prestamo = Prestamo(
             inventario=formatear_inventario(inventario_raw),
@@ -146,7 +150,7 @@ def vista_profesor():
             cedula=cedula,
             estudiante=estudiante[:100],
             grupo=grupo,
-            profesor=request.form.get('profesor', 'Docente')[:100],
+            profesor=profesor_nombre[:100],
             asignatura=request.form.get('asignatura', 'General'),
             cargador_entregado=request.form.get('cargador', 'No'),
             caja_entregada=request.form.get('caja', 'No'),
@@ -158,8 +162,13 @@ def vista_profesor():
         flash("¡Préstamo registrado exitosamente!", "success")
         return redirect(url_for('vista_profesor'))
         
-    # Enviamos los últimos 15 registros para que el profesor pueda revisarlos, editarlos o borrarlos si se equivocó
-    ultimos_prestamos = Prestamo.query.order_by(Prestamo.id.desc()).limit(15).all()
+    # FILTRADO INTELIGENTE: Solo mostramos los registros que pertenecen al profesor activo en la sesión
+    profesor_actual = session.get('profesor_actual', '')
+    if profesor_actual:
+        ultimos_prestamos = Prestamo.query.filter_by(profesor=profesor_actual).order_by(Prestamo.id.desc()).limit(15).all()
+    else:
+        ultimos_prestamos = []
+
     return render_template('profesor.html', prestamos=ultimos_prestamos)
 
 @app.route('/editar/<int:id>', methods=['GET', 'POST'])
