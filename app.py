@@ -71,6 +71,7 @@ def vista_direccion():
     grupo_filtro = request.args.get('grupo', '')
     fecha_inicio = request.args.get('fecha_inicio', '')
     fecha_fin = request.args.get('fecha_fin', '')
+    page = request.args.get('page', 1, type=int)
     
     if asignatura_filtro: query = query.filter_by(asignatura=asignatura_filtro)
     if grupo_filtro: query = query.filter_by(grupo=grupo_filtro)
@@ -81,13 +82,17 @@ def vista_direccion():
         try: query = query.filter(Prestamo.fecha_entrega <= datetime.strptime(fecha_fin + ' 23:59:59', '%Y-%m-%d %H:%M:%S'))
         except: pass
             
-    prestamos = query.order_by(Prestamo.id.desc()).all()
+    # PASO 2: Paginación aplicada correctamente (50 registros por página)
+    pagination = query.order_by(Prestamo.id.desc()).paginate(page=page, per_page=50, error_out=False)
+    prestamos = pagination.items
+    
     todas_asignaturas = [a[0] for a in db.session.query(Prestamo.asignatura).distinct().all() if a[0]]
     todos_grupos = [g[0] for g in db.session.query(Prestamo.grupo).distinct().all() if g[0]]
     
-    return render_template('direccion.html', prestamos=prestamos, total=len(prestamos), 
-                           novedades=sum(1 for p in prestamos if p.novedad_detectada), 
-                           confirmados=sum(1 for p in prestamos if p.confirmado_estudiante), 
+    return render_template('direccion.html', prestamos=prestamos, pagination=pagination, 
+                           total=pagination.total, 
+                           novedades=sum(1 for p in Prestamo.query.all() if p.novedad_detectada), 
+                           confirmados=sum(1 for p in Prestamo.query.all() if p.confirmado_estudiante), 
                            todas_asignaturas=todas_asignaturas, todos_grupos=todos_grupos,
                            asignatura_filtro=asignatura_filtro, grupo_filtro=grupo_filtro,
                            fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, ahora=hora_cr())
@@ -235,9 +240,6 @@ def vista_estudiante():
         ).order_by(Prestamo.id.desc()).first()
         
     return render_template('estudiante.html', inv_query=inv_query_raw, prestamo=prestamo_actual)
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
